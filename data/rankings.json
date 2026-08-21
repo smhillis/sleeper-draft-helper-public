@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "season": 2026,
+  "updatedAt": "2026-08-21T18:45:00Z",
+  "status": "initial-consensus-seed",
+  "methodology": {
+    "description": "Public draft-helper consensus seed. Ranking value and market cost are kept separate. League scoring, roster construction, draft slot, drafted players, positional scarcity and next-pick pressure are applied by the client recommendation engine.",
+    "rankingInputs": [
+      "FantasyPros 2026 PPR expert consensus (153 experts, Aug. 20)",
+      "FantasyPros staff PPR rankings (Derek Brown, Andrew Erickson, Pat Fitzmaurice)",
+      "Pat Fitzmaurice PPR rankings",
+      "Tera Roberts PPR rankings",
+      "Scott Bogman PPR rankings",
+      "Fantasy BR staff PPR rankings",
+      "Jeremy Shulman / Fantasy Football Universe PPR rankings"
+    ],
+    "marketInput": "FantasyPros aggregated 2026 ADP as a temporary market proxy; Sleeper-specific market data is the next input to add.",
+    "notes": "This file is centralized so rankings can be refreshed without changing the app UI. It intentionally does not alter Scott's separate personal draft assistant."
+  },
+  "players": [
+    {"name":"Ja'Marr Chase","pos":"WR","team":"CIN","consensusRank":1,"adp":3,"confidence":0.98},
+    {"name":"Jahmyr Gibbs","pos":"RB","team":"DET","consensusRank":2,"adp":1,"confidence":0.97},
+    {"name":"Puka Nacua","pos":"WR","team":"LAR","consensusRank":3,"adp":6,"confidence":0.96},
+    {"name":"Bijan Robinson","pos":"RB","team":"ATL","consensusRank":4,"adp":2,"confidence":0.96},
+    {"name":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","consensusRank":5,"adp":8,"confidence":0.95},
+    {"name":"Amon-Ra St. Brown","pos":"WR","team":"DET","consensusRank":6,"adp":11,"confidence":0.94},
+    {"name":"CeeDee Lamb","pos":"WR","team":"DAL","consensusRank":7,"adp":13,"confidence":0.90},
+    {"name":"Justin Jefferson","pos":"WR","team":"MIN","consensusRank":8,"adp":16,"confidence":0.90},
+    {"name":"Christian McCaffrey","pos":"RB","team":"SF","consensusRank":9,"adp":4,"confidence":0.86},
+    {"name":"Drake London","pos":"WR","team":"ATL","consensusRank":10,"adp":20,"confidence":0.89},
+    {"name":"Jonathan Taylor","pos":"RB","team":"IND","consensusRank":11,"adp":5,"confidence":0.91},
+    {"name":"A.J. Brown","pos":"WR","team":"NE","consensusRank":12,"adp":28,"confidence":0.88},
+    {"name":"Ashton Jeanty","pos":"RB","team":"LV","consensusRank":13,"adp":10,"confidence":0.82},
+    {"name":"Nico Collins","pos":"WR","team":"HOU","consensusRank":14,"adp":27,"confidence":0.88},
+    {"name":"James Cook III","pos":"RB","team":"BUF","consensusRank":15,"adp":7,"confidence":0.88},
+    {"name":"Chase Brown","pos":"RB","team":"CIN","consensusRank":16,"adp":17,"confidence":0.87},
+    {"name":"Brock Bowers","pos":"TE","team":"LV","consensusRank":17,"adp":22,"confidence":0.87},
+    {"name":"George Pickens","pos":"WR","team":"DAL","consensusRank":18,"adp":26,"confidence":0.85},
+    {"name":"Chris Olave","pos":"WR","team":"NO","consensusRank":19,"adp":29,"confidence":0.84},
+    {"name":"Trey McBride","pos":"TE","team":"ARI","consensusRank":20,"adp":21,"confidence":0.86},
+    {"name":"De'Von Achane","pos":"RB","team":"MIA","consensusRank":21,"adp":11,"confidence":0.80},
+    {"name":"Rashee Rice","pos":"WR","team":"KC","consensusRank":22,"adp":26,"confidence":0.78},
+    {"name":"Saquon Barkley","pos":"RB","team":"PHI","consensusRank":24,"adp":14,"confidence":0.81},
+    {"name":"Malik Nabers","pos":"WR","team":"NYG","consensusRank":26,"adp":32,"confidence":0.72},
+    {"name":"Kenneth Walker III","pos":"RB","team":"KC","consensusRank":28,"adp":19,"confidence":0.70},
+    {"name":"Tetairoa McMillan","pos":"WR","team":"CAR","consensusRank":32,"adp":38,"confidence":0.72},
+    {"name":"Garrett Wilson","pos":"WR","team":"NYJ","consensusRank":49,"adp":40,"confidence":0.60}
+  ]
+}

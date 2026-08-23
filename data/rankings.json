@@ -1,39 +1,40 @@
 {
   "schemaVersion": 1,
   "season": 2026,
-  "updatedAt": "2026-08-22T12:16:00Z",
+  "updatedAt": "2026-08-23T12:41:00Z",
   "status": "daily-refresh",
   "methodology": {
     "description": "Public draft-helper PPR redraft board. Player value and market cost are intentionally kept separate. Rankings blend broad expert consensus, current projections, recent independent expert boards and material preseason/news context; ADP is treated as price rather than player quality. League scoring, roster construction, draft slot, drafted players, positional scarcity and next-pick pressure are applied by the client recommendation engine.",
     "rankingInputs": [
-      "FantasyPros 2026 PPR expert consensus (155 experts, Aug. 21)",
-      "FantasyPros staff PPR rankings: Derek Brown and Andrew Erickson (Aug. 21), Pat Fitzmaurice (Aug. 19-20)",
-      "Fantasy BR staff PPR rankings (Aug. 19)",
-      "Kyle Yates / Yates Fantasy Football PPR rankings (Aug. 21)",
-      "Mike Fanelli / FantasyPros PPR rankings (Aug. 13)",
-      "Tera Roberts / FantasyPros PPR rankings (Aug. 12)",
-      "CBS Sports expert draft rankings and projections (Aug. 17)",
-      "4for4 PPR rankings/projections and multi-site ADP as a slower-moving projection cross-check"
+      "FantasyPros 2026 PPR expert consensus (154 experts, Aug. 22)",
+      "FantasyPros independent PPR boards: Scott Bogman and Pat Fitzmaurice (Aug. 22), Derek Brown and Andrew Erickson (Aug. 21)",
+      "Fantasy BR staff PPR rankings (Aug. 20)",
+      "Justin Weigal / FantasySharks PPR rankings (Aug. 22)",
+      "Ken Zalis / PressBox PPR rankings (Aug. 21)",
+      "CBS Sports expert draft rankings, projections and preseason riser/faller analysis (Aug. 17-21)",
+      "NFL.com 2026 RB/WR draft tiers and current preseason reporting",
+      "ESPN 2026 offensive depth charts, projections and position profiles as a cross-check"
     ],
-    "marketInput": "Current FantasyPros aggregated PPR ADP is the primary market-price input, cross-checked against source-specific ESPN/CBS/Fantrax/Sleeper values where available. ADP is not used as a substitute for player value.",
+    "marketInput": "Current FantasyPros aggregated PPR ADP is the primary market-price input, including current ESPN, Sleeper, CBS, RTSports and Fantrax values where available. Sleeper-specific ADP is cross-checked separately. ADP is not used as a substitute for player value.",
     "newsInputs": [
-      "NFL.com: Rashee Rice will not face additional league discipline after the NFL closed its investigation (Aug. 21)",
-      "CBS/Rotowire: Christian McCaffrey held out of preseason action with minor tightness; Kyle Shanahan indicated he would practice if it were the regular season (Aug. 20)",
-      "CBS Sports: Saints rookie WR Jordyn Tyson hamstring injury may linger into the season, increasing Chris Olave target security (Aug. 17)",
-      "Current preseason usage, depth-chart and injury reporting reviewed for material changes; no other top-board news warranted a large move this refresh"
+      "NFL.com and CBS Sports preseason Week 2 reporting reviewed through the completed Aug. 22 games; no new top-board injury, suspension, trade or usage event warranted a material value move in this refresh",
+      "NFL.com: Rashee Rice will not face additional league discipline after the NFL closed its investigation (Aug. 21); knee recovery remains the primary player-specific risk",
+      "CBS/Rotowire: Christian McCaffrey's preseason tightness remains described as minor, with San Francisco previously indicating he would practice if it were the regular season",
+      "CBS Sports: Jordyn Tyson's hamstring injury remains a meaningful early-season target-volume boost for Chris Olave",
+      "Seattle-Tennessee had not yet played its Aug. 23 preseason game at the time of this refresh, so no Sunday-night usage is incorporated"
     ],
-    "notes": "Expert disagreement is preserved with expertLow/expertHigh ranges where current source coverage supports it. Confidence reflects agreement plus news certainty, not ceiling. This file is used only by smhillis/sleeper-draft-helper-public and must not be copied into or used to modify Scott's personal Sleeper Draft Assistant."
+    "notes": "Expert disagreement is preserved with expertLow/expertHigh ranges where current source coverage supports it. Confidence reflects agreement plus news certainty, not ceiling. The Aug. 23 refresh found no evidence strong enough to justify a material top-board rerank after the larger Aug. 22 update; value ranks are therefore intentionally stable while source freshness and disagreement inputs are refreshed. This file is used only by smhillis/sleeper-draft-helper-public and must not be copied into or used to modify Scott's personal Sleeper Draft Assistant."
   },
   "players": [
     {"name":"Ja'Marr Chase","pos":"WR","team":"CIN","consensusRank":1,"adp":3,"confidence":0.98,"expertHigh":1,"expertLow":6},
     {"name":"Jahmyr Gibbs","pos":"RB","team":"DET","consensusRank":2,"adp":1,"confidence":0.97,"expertHigh":1,"expertLow":7},
     {"name":"Puka Nacua","pos":"WR","team":"LAR","consensusRank":3,"adp":4,"confidence":0.96,"expertHigh":1,"expertLow":9},
-    {"name":"Bijan Robinson","pos":"RB","team":"ATL","consensusRank":4,"adp":2,"confidence":0.96,"expertHigh":2,"expertLow":7},
+    {"name":"Bijan Robinson","pos":"RB","team":"ATL","consensusRank":4,"adp":2,"confidence":0.96,"expertHigh":2,"expertLow":5},
     {"name":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","consensusRank":5,"adp":6,"confidence":0.95,"expertHigh":1,"expertLow":11},
     {"name":"Amon-Ra St. Brown","pos":"WR","team":"DET","consensusRank":6,"adp":8,"confidence":0.94,"expertHigh":4,"expertLow":6},
     {"name":"CeeDee Lamb","pos":"WR","team":"DAL","consensusRank":7,"adp":12,"confidence":0.89,"expertHigh":6,"expertLow":16},
     {"name":"James Cook III","pos":"RB","team":"BUF","consensusRank":8,"adp":9,"confidence":0.90,"expertHigh":7,"expertLow":17,"news":"Strong current expert support; market still prices him closer to the late first/early second than several rankers do."},
-    {"name":"Justin Jefferson","pos":"WR","team":"MIN","consensusRank":9,"adp":13,"confidence":0.87,"expertHigh":9,"expertLow":20},
+    {"name":"Justin Jefferson","pos":"WR","team":"MIN","consensusRank":9,"adp":13,"confidence":0.87,"expertHigh":8,"expertLow":20},
     {"name":"Christian McCaffrey","pos":"RB","team":"SF","consensusRank":10,"adp":5,"confidence":0.82,"expertHigh":7,"expertLow":13,"news":"Minor preseason tightness is being downplayed by San Francisco; value remains elite but injury uncertainty keeps confidence below the other first-round backs."},
     {"name":"Jonathan Taylor","pos":"RB","team":"IND","consensusRank":11,"adp":7,"confidence":0.90,"expertHigh":7,"expertLow":12},
     {"name":"A.J. Brown","pos":"WR","team":"NE","consensusRank":12,"adp":20,"confidence":0.87,"expertHigh":8,"expertLow":20},
@@ -43,7 +44,7 @@
     {"name":"Brock Bowers","pos":"TE","team":"LV","consensusRank":16,"adp":22,"confidence":0.87,"expertHigh":10,"expertLow":19},
     {"name":"Chris Olave","pos":"WR","team":"NO","consensusRank":17,"adp":28,"confidence":0.86,"expertHigh":11,"expertLow":26,"news":"Jordyn Tyson's hamstring issue improves Olave's already strong target-volume outlook."},
     {"name":"Rashee Rice","pos":"WR","team":"KC","consensusRank":18,"adp":26,"confidence":0.82,"expertHigh":8,"expertLow":22,"news":"NFL closed its investigation with no additional discipline. Knee recovery remains the main risk, materially reducing the prior suspension discount."},
-    {"name":"George Pickens","pos":"WR","team":"DAL","consensusRank":19,"adp":24,"confidence":0.84,"expertHigh":12,"expertLow":19},
+    {"name":"George Pickens","pos":"WR","team":"DAL","consensusRank":19,"adp":24,"confidence":0.84,"expertHigh":11,"expertLow":19},
     {"name":"Trey McBride","pos":"TE","team":"ARI","consensusRank":20,"adp":21,"confidence":0.86,"expertHigh":16,"expertLow":22},
     {"name":"Ashton Jeanty","pos":"RB","team":"LV","consensusRank":21,"adp":10,"confidence":0.76,"expertHigh":8,"expertLow":21,"news":"Large gap between market price and current expert boards; kept as a value/price disagreement rather than blindly following ADP."},
     {"name":"De'Von Achane","pos":"RB","team":"MIA","consensusRank":22,"adp":11,"confidence":0.78,"expertHigh":13,"expertLow":23},

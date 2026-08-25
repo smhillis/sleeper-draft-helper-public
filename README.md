@@ -8,6 +8,8 @@ Recommendations use league-specific scoring, roster needs, value over replacemen
 
 For leagues that require one kicker and one team defense, the default roster-completion policy reserves those positions for the final two draft selections. Other unfinished required starters are filled before that reserve window so the roster can still finish legally. Leagues without K/DEF slots are unaffected, and leagues with different specialty-slot counts reserve only the number of selections actually required.
 
+Production is expected to track the current `main` strategy implementation.
+
 ## Validation
 
 Run `npm run validate:draft-engine` to execute the synthetic scoring/roster scenarios, opportunity-strategy checks, and full deterministic mock-draft simulation against the production recommendation engine.

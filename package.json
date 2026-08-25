@@ -1,0 +1,7 @@
+{
+  "name": "whotodraftnext-sleeper",
+  "private": true,
+  "scripts": {
+    "validate:draft-engine": "node validation/draft-engine-validation.js"
+  }
+}

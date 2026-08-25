@@ -27,6 +27,7 @@ if (!engine) throw new Error('Production Sleeper engine did not load');
 
 const finite = (value) => Number.isFinite(Number(value));
 const norm = (value) => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
 function mulberry32(seed) {
   let a = seed >>> 0;
   return () => {
@@ -37,6 +38,7 @@ function mulberry32(seed) {
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
   };
 }
+
 function projection(pos, positionRank) {
   const scale = Math.max(.46, 1.18 - (positionRank - 1) * .018);
   if (pos === 'QB') return { pos, passAtt: 520 * scale, passCmp: 345 * scale, passYds: 4050 * scale, passTd: 28 * scale, passInt: 11 / Math.max(.72, scale), rushAtt: 62 * scale, rushYds: 315 * scale, rushTd: 3.5 * scale };
@@ -47,6 +49,7 @@ function projection(pos, positionRank) {
   if (pos === 'DEF') return { pos, sacks: 42 * scale, ints: 13 * scale, fumRec: 9 * scale, ff: 12 * scale, defTd: 2.4 * scale, stTd: .4 * scale, safeties: .6 * scale, blocks: 1.1 * scale, pa: 365 / Math.max(.72, scale), ya: 5400 / Math.max(.72, scale) };
   return { pos };
 }
+
 function buildBoard() {
   const counts = { QB: 28, RB: 68, WR: 72, TE: 32, K: 16, DEF: 16 };
   const raw = [];
@@ -73,21 +76,27 @@ function buildBoard() {
     };
   });
 }
+
 function draftSlotForOverall(overall, teams) {
   const round = Math.floor((overall - 1) / teams) + 1;
   const inRound = ((overall - 1) % teams) + 1;
   return round % 2 === 1 ? inRound : teams - inRound + 1;
 }
+
 function chooseOpponent(available, overall, rng) {
   let best = null;
   let bestDistance = Infinity;
   for (const row of available) {
     const jitter = (rng() + rng() + rng() - 1.5) * 14;
     const distance = Math.abs((Number(row.adp) || Number(row.consensusRank) || 999) + jitter - overall);
-    if (distance < bestDistance) { best = row; bestDistance = distance; }
+    if (distance < bestDistance) {
+      best = row;
+      bestDistance = distance;
+    }
   }
   return best;
 }
+
 function reset(board, teams, slot) {
   Object.assign(engine.state, {
     board,
@@ -106,6 +115,7 @@ function reset(board, teams, slot) {
     showMoreRecommendations: false,
   });
 }
+
 function simulate(seed, { teams = 12, slot = 8, rounds = 15 } = {}) {
   const rng = mulberry32(seed);
   const board = buildBoard();
@@ -113,7 +123,7 @@ function simulate(seed, { teams = 12, slot = 8, rounds = 15 } = {}) {
   const maxOverall = teams * rounds;
   let strategySignals = 0;
   let lowSurvivalSelections = 0;
-  let earlySpecialty = 0;
+
   for (let overall = 1; overall <= maxOverall; overall += 1) {
     const gone = new Set(engine.state.picks.map((p) => norm(`${p.metadata?.first_name || ''} ${p.metadata?.last_name || ''}`)));
     const available = board.filter((row) => !gone.has(norm(row.name)));
@@ -127,8 +137,6 @@ function simulate(seed, { teams = 12, slot = 8, rounds = 15 } = {}) {
       chosen = recs[0];
       if (chosen.decisionNote) strategySignals += 1;
       if (chosen.survivalProbability != null && chosen.survivalProbability <= .35) lowSurvivalSelections += 1;
-      const round = Math.floor((overall - 1) / teams) + 1;
-      if ((chosen.pos === 'K' || chosen.pos === 'DEF') && round <= 7) earlySpecialty += 1;
     } else {
       chosen = chooseOpponent(available, overall, rng);
     }
@@ -138,17 +146,30 @@ function simulate(seed, { teams = 12, slot = 8, rounds = 15 } = {}) {
       metadata: { first_name: chosen.name, last_name: '', position: chosen.pos, team: chosen.team },
     });
   }
+
   const names = engine.state.picks.map((p) => norm(`${p.metadata?.first_name || ''} ${p.metadata?.last_name || ''}`));
   const mine = engine.state.picks.filter((p) => p.draft_slot === slot);
-  const counts = mine.reduce((acc, p) => { const pos = p.metadata?.position; acc[pos] = (acc[pos] || 0) + 1; return acc; }, {});
+  const counts = mine.reduce((acc, p) => {
+    const pos = p.metadata?.position;
+    acc[pos] = (acc[pos] || 0) + 1;
+    return acc;
+  }, {});
   const skill = (counts.RB || 0) + (counts.WR || 0) + (counts.TE || 0);
+  const beforeFinalTwo = mine.slice(0, -2);
+  const finalTwo = mine.slice(-2).map((p) => p.metadata?.position).sort();
+  const specialtyEarly = beforeFinalTwo.some((p) => p.metadata?.position === 'K' || p.metadata?.position === 'DEF');
+  const finalTwoCorrect = finalTwo.length === 2 && finalTwo[0] === 'DEF' && finalTwo[1] === 'K';
+
   return {
     unique: new Set(names).size === names.length,
     mineCount: mine.length,
+    counts,
     requiredFilled: (counts.QB || 0) >= 1 && (counts.RB || 0) >= 2 && (counts.WR || 0) >= 2 && (counts.TE || 0) >= 1 && (counts.K || 0) >= 1 && (counts.DEF || 0) >= 1 && skill >= 6,
+    specialtyEarly,
+    finalTwoCorrect,
+    finalTwo,
     strategySignals,
     lowSurvivalSelections,
-    earlySpecialty,
     fingerprint: mine.map((p) => p.metadata.first_name).join('|'),
   };
 }
@@ -158,30 +179,44 @@ function check(name, condition, details = {}) {
   results.push({ name, passed: Boolean(condition), details });
   if (!condition) console.error(`FAIL: ${name}`, details);
 }
+
 const simulations = 160;
 let duplicateFailures = 0;
 let rosterFailures = 0;
 let shortDrafts = 0;
+let specialtyEarlyFailures = 0;
+let finalTwoFailures = 0;
 let totalSignals = 0;
 let totalLowSurvival = 0;
-let earlySpecialty = 0;
+const rosterFailureSamples = [];
+const specialtyFailureSamples = [];
+
 for (let seed = 1; seed <= simulations; seed += 1) {
   const result = simulate(seed);
   if (!result.unique) duplicateFailures += 1;
-  if (!result.requiredFilled) rosterFailures += 1;
+  if (!result.requiredFilled) {
+    rosterFailures += 1;
+    if (rosterFailureSamples.length < 5) rosterFailureSamples.push({ seed, counts: result.counts, finalTwo: result.finalTwo, fingerprint: result.fingerprint });
+  }
   if (result.mineCount !== 15) shortDrafts += 1;
+  if (result.specialtyEarly) specialtyEarlyFailures += 1;
+  if (!result.finalTwoCorrect) {
+    finalTwoFailures += 1;
+    if (specialtyFailureSamples.length < 5) specialtyFailureSamples.push({ seed, finalTwo: result.finalTwo, fingerprint: result.fingerprint });
+  }
   totalSignals += result.strategySignals;
   totalLowSurvival += result.lowSurvivalSelections;
-  earlySpecialty += result.earlySpecialty;
 }
+
 const repeatA = simulate(8675309);
 const repeatB = simulate(8675309);
 check('160 complete snake drafts finish without duplicate players', duplicateFailures === 0, { duplicateFailures });
 check('every simulated user receives all 15 selections', shortDrafts === 0, { shortDrafts });
-check('standard-league required starters are filled by draft end', rosterFailures === 0, { rosterFailures });
+check('standard-league required starters are filled by draft end', rosterFailures === 0, { rosterFailures, rosterFailureSamples });
+check('K/DEF never appear before the final two user selections', specialtyEarlyFailures === 0, { specialtyEarlyFailures, specialtyFailureSamples });
+check('the final two user selections are one K and one DEF', finalTwoFailures === 0, { finalTwoFailures, specialtyFailureSamples });
 check('why-now strategy signals appear throughout full drafts', totalSignals >= simulations * 10, { totalSignals });
 check('simulation exercises low-survival take-now decisions', totalLowSurvival > simulations, { totalLowSurvival });
-check('K/DEF remain suppressed through round 7', earlySpecialty === 0, { earlySpecialty });
 check('same seed produces identical full user draft', repeatA.fingerprint === repeatB.fingerprint, { fingerprint: repeatA.fingerprint });
 
 const passed = results.filter((r) => r.passed).length;

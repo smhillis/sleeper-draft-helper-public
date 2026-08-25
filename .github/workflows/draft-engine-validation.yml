@@ -5,16 +5,22 @@ on:
     branches: [main]
     paths:
       - 'app.js'
+      - 'draft-strategy.js'
+      - 'index.html'
       - 'data/**'
       - 'validation/**'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/draft-engine-validation.yml'
   pull_request:
     paths:
       - 'app.js'
+      - 'draft-strategy.js'
+      - 'index.html'
       - 'data/**'
       - 'validation/**'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/draft-engine-validation.yml'
   workflow_dispatch:
 

@@ -1,7 +1,7 @@
 (() => {
   const platforms = {
     yahoo: {
-      live: false,
+      live: true,
       url: "https://yahoo.whotodraftnext.com/",
     },
   };

@@ -145,7 +145,7 @@ function simulate(seed, { teams = 12, slot = 8, rounds = 15 } = {}) {
   return {
     unique: new Set(names).size === names.length,
     mineCount: mine.length,
-    requiredFilled: (counts.QB || 0) >= 1 && (counts.RB || 0) >= 2 && (counts.WR || 0) >= 2 && (counts.TE || 0) >= 1 && (counts.K || 0) >= 1 && (counts.DEF || 0) >= 1 && skill >= 7,
+    requiredFilled: (counts.QB || 0) >= 1 && (counts.RB || 0) >= 2 && (counts.WR || 0) >= 2 && (counts.TE || 0) >= 1 && (counts.K || 0) >= 1 && (counts.DEF || 0) >= 1 && skill >= 6,
     strategySignals,
     lowSurvivalSelections,
     earlySpecialty,

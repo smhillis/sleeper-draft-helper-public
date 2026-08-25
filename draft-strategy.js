@@ -96,6 +96,30 @@
     return counts;
   }
 
+  function ownRosterCounts(state) {
+    const counts = {};
+    const slot = num(state?.slot, 0);
+    (state?.picks || []).forEach((pick) => {
+      if (slot && num(pick?.draft_slot, 0) !== slot) return;
+      const pos = normalizePos(pick?.metadata?.position || pick?.position || pick?.pos);
+      if (pos) counts[pos] = (counts[pos] || 0) + 1;
+    });
+    return counts;
+  }
+
+  function starterCompletionContext(state) {
+    const profile = engine.rosterProfile();
+    const own = ownRosterCounts(state);
+    const required = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'DL', 'LB', 'DB'];
+    const missingByPosition = Object.fromEntries(required.map((pos) => [pos, Math.max(0, num(profile?.[pos], 0) - num(own[pos], 0))]));
+    const totalMissing = Object.values(missingByPosition).reduce((sum, value) => sum + value, 0);
+    const rosterSize = Array.isArray(state?.league?.roster_positions) && state.league.roster_positions.length
+      ? state.league.roster_positions.length
+      : Math.max(16, Object.values(own).reduce((sum, value) => sum + value, 0) + totalMissing);
+    const draftedCount = Object.values(own).reduce((sum, value) => sum + value, 0);
+    return { missingByPosition, totalMissing, remainingPicks: Math.max(0, rosterSize - draftedCount) };
+  }
+
   function replacementMetrics(baseRows, state) {
     const context = nextUserPicks(state);
     const profile = engine.rosterProfile();
@@ -129,7 +153,8 @@
     return metrics;
   }
 
-  function decisionNote({ survivalProbability, valueAboveReplacement, tierDrop, following }) {
+  function decisionNote({ survivalProbability, valueAboveReplacement, tierDrop, following, completionAdjustment, pos }) {
+    if (completionAdjustment >= 45) return `Fill required ${pos} before roster spots run out`;
     const vor = num(valueAboveReplacement, 0);
     const gap = num(tierDrop, 0);
     if (survivalProbability != null && following) {
@@ -148,6 +173,7 @@
   function applyDraftStrategy(baseRows, state) {
     const replacement = replacementMetrics(baseRows, state);
     const context = nextUserPicks(state);
+    const completion = starterCompletionContext(state);
     return (baseRows || []).map((row) => {
       const metric = replacement.get(row.name) || { valueAboveReplacement: 0, tierDrop: 0, replacementScore: num(row.score), replacementIndex: 1 };
       const survivalProbability = survivalProbabilityAtNextTurn(row, state);
@@ -155,7 +181,15 @@
       const vorAdjustment = clamp(metric.valueAboveReplacement * 0.22, -6, 16);
       const tierAdjustment = clamp(metric.tierDrop * 0.45, 0, 8);
       const opportunityCost = risk * clamp(5 + Math.max(0, metric.valueAboveReplacement) * 0.18 + metric.tierDrop * 0.60, 0, 18);
-      const strategyScore = num(row.score) + vorAdjustment + tierAdjustment + opportunityCost;
+      const pos = normalizePos(row?.pos);
+      const missingAtPosition = num(completion.missingByPosition[pos], 0);
+      let completionAdjustment = 0;
+      if (missingAtPosition > 0 && completion.totalMissing > 0) {
+        if (completion.remainingPicks <= completion.totalMissing) completionAdjustment = 120;
+        else if (completion.remainingPicks <= completion.totalMissing + 1) completionAdjustment = 80;
+        else if (completion.remainingPicks <= completion.totalMissing + 2) completionAdjustment = 45;
+      }
+      const strategyScore = num(row.score) + vorAdjustment + tierAdjustment + opportunityCost + completionAdjustment;
       return {
         ...row,
         baseScore: num(row.score),
@@ -168,12 +202,15 @@
         tierDrop: metric.tierDrop,
         survivalProbability,
         opportunityCost,
+        completionAdjustment,
         nextPickOverall: context.following,
         decisionNote: decisionNote({
           survivalProbability,
           valueAboveReplacement: metric.valueAboveReplacement,
           tierDrop: metric.tierDrop,
           following: context.following,
+          completionAdjustment,
+          pos,
         }),
       };
     }).sort((a, b) => num(b.score) - num(a.score));

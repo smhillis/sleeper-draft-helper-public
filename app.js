@@ -39,16 +39,19 @@ async function loadBoard() {
   const primary = rankingsResult.value.players || [];
   const depth = depthResult.status === 'fulfilled' ? depthResult.value.players || [] : [];
   const specialty = specialtyResult.status === 'fulfilled' ? specialtyResult.value.players || [] : [];
+  state.board = mergeBoards(primary, depth, specialty);
+  const raw = projectionsResult.status === 'fulfilled' ? projectionsResult.value.players || {} : {};
+  state.projections = Object.fromEntries(Object.entries(raw).map(([name, projection]) => [norm(name), { ...projection, pos: normalizePos(projection.pos) }]));
+}
+
+function mergeBoards(primary, depth, specialty) {
   const merged = new Map();
   [...primary, ...depth, ...specialty].forEach((player) => {
     const key = norm(player.name);
     if (!key || merged.has(key)) return;
     merged.set(key, { ...player, pos: normalizePos(player.pos) });
   });
-  state.board = [...merged.values()].sort((a, b) => num(a.consensusRank, 999) - num(b.consensusRank, 999));
-
-  const raw = projectionsResult.status === 'fulfilled' ? projectionsResult.value.players || {} : {};
-  state.projections = Object.fromEntries(Object.entries(raw).map(([name, projection]) => [norm(name), { ...projection, pos: normalizePos(projection.pos) }]));
+  return [...merged.values()].sort((a, b) => num(a.consensusRank, 999) - num(b.consensusRank, 999));
 }
 
 async function loadPlayers() {
@@ -438,6 +441,23 @@ function recommendations() {
       return { ...p, pos, score: base + need + flexNeed + qbScarcity + qbEarly + idpFormat + specialtyEarly + fillPressure + overfill + urgency + confidence + scoringAdjustment, scoringAdjustment };
     })
     .sort((a, b) => b.score - a.score);
+}
+
+// The validation harness uses this same production engine surface. Keeping the
+// UI/network lifecycle below separate means validation never needs Sleeper
+// credentials, a live league, or a browser session.
+if (typeof window !== 'undefined') {
+  window.SleeperDraftEngine = {
+    state,
+    normalizePos,
+    rosterProfile,
+    projectionFor,
+    leaguePoints,
+    scoringCoverage,
+    recommendations,
+    mergeBoards,
+    loadBoard,
+  };
 }
 
 function card(p, i) {

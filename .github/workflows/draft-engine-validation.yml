@@ -1,0 +1,32 @@
+name: Validate Sleeper draft engine
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app.js'
+      - 'data/**'
+      - 'validation/**'
+      - 'package.json'
+      - '.github/workflows/draft-engine-validation.yml'
+  pull_request:
+    paths:
+      - 'app.js'
+      - 'data/**'
+      - 'validation/**'
+      - 'package.json'
+      - '.github/workflows/draft-engine-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm run validate:draft-engine

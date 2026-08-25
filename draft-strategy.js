@@ -107,17 +107,40 @@
     return counts;
   }
 
+  function isDraftableRosterSlot(position) {
+    const pos = normalizePos(position);
+    return !['IR', 'IL', 'NA', 'RES', 'RESERVE'].includes(pos);
+  }
+
   function starterCompletionContext(state) {
     const profile = engine.rosterProfile();
     const own = ownRosterCounts(state);
     const required = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'DL', 'LB', 'DB'];
     const missingByPosition = Object.fromEntries(required.map((pos) => [pos, Math.max(0, num(profile?.[pos], 0) - num(own[pos], 0))]));
-    const totalMissing = Object.values(missingByPosition).reduce((sum, value) => sum + value, 0);
-    const rosterSize = Array.isArray(state?.league?.roster_positions) && state.league.roster_positions.length
-      ? state.league.roster_positions.length
-      : Math.max(16, Object.values(own).reduce((sum, value) => sum + value, 0) + totalMissing);
+    const specialtyMissing = num(missingByPosition.K) + num(missingByPosition.DEF);
+    const nonSpecialtyMissing = required
+      .filter((pos) => pos !== 'K' && pos !== 'DEF')
+      .reduce((sum, pos) => sum + num(missingByPosition[pos]), 0);
+    const totalMissing = specialtyMissing + nonSpecialtyMissing;
+    const configuredSlots = Array.isArray(state?.league?.roster_positions)
+      ? state.league.roster_positions.filter(isDraftableRosterSlot)
+      : [];
     const draftedCount = Object.values(own).reduce((sum, value) => sum + value, 0);
-    return { missingByPosition, totalMissing, remainingPicks: Math.max(0, rosterSize - draftedCount) };
+    const rosterSize = configuredSlots.length || Math.max(15, draftedCount + totalMissing);
+    const remainingPicks = Math.max(0, rosterSize - draftedCount);
+    const forceNonSpecialty = nonSpecialtyMissing > 0 && remainingPicks <= nonSpecialtyMissing + specialtyMissing;
+    const forceSpecialty = nonSpecialtyMissing === 0 && specialtyMissing > 0 && remainingPicks <= specialtyMissing;
+    const holdSpecialty = specialtyMissing > 0 && !forceSpecialty;
+    return {
+      missingByPosition,
+      totalMissing,
+      specialtyMissing,
+      nonSpecialtyMissing,
+      remainingPicks,
+      forceNonSpecialty,
+      forceSpecialty,
+      holdSpecialty,
+    };
   }
 
   function replacementMetrics(baseRows, state) {
@@ -153,8 +176,11 @@
     return metrics;
   }
 
-  function decisionNote({ survivalProbability, valueAboveReplacement, tierDrop, following, completionAdjustment, pos }) {
-    if (completionAdjustment >= 45) return `Fill required ${pos} before roster spots run out`;
+  function decisionNote({ survivalProbability, valueAboveReplacement, tierDrop, following, mustFillNow, pos, specialtyMissing }) {
+    if (mustFillNow && (pos === 'K' || pos === 'DEF')) {
+      return specialtyMissing > 1 ? `Final picks reserved for K/DEF · fill ${pos}` : `Final pick reserved for ${pos}`;
+    }
+    if (mustFillNow) return `Fill required ${pos} before final K/DEF picks`;
     const vor = num(valueAboveReplacement, 0);
     const gap = num(tierDrop, 0);
     if (survivalProbability != null && following) {
@@ -166,7 +192,7 @@
       return `${pct}% chance to make it back`;
     }
     if (gap >= 7) return 'Meaningful tier drop behind him';
-    if (vor >= 12) return 'Strong value above replacement';
+    if (vor >= 12) return 'Strong value over replacement';
     return 'Best current roster-adjusted value';
   }
 
@@ -183,13 +209,14 @@
       const opportunityCost = risk * clamp(5 + Math.max(0, metric.valueAboveReplacement) * 0.18 + metric.tierDrop * 0.60, 0, 18);
       const pos = normalizePos(row?.pos);
       const missingAtPosition = num(completion.missingByPosition[pos], 0);
-      let completionAdjustment = 0;
-      if (missingAtPosition > 0 && completion.totalMissing > 0) {
-        if (completion.remainingPicks <= completion.totalMissing) completionAdjustment = 120;
-        else if (completion.remainingPicks <= completion.totalMissing + 1) completionAdjustment = 80;
-        else if (completion.remainingPicks <= completion.totalMissing + 2) completionAdjustment = 45;
-      }
-      const strategyScore = num(row.score) + vorAdjustment + tierAdjustment + opportunityCost + completionAdjustment;
+      const isSpecialty = pos === 'K' || pos === 'DEF';
+      const mustFillNow = missingAtPosition > 0 && (
+        (completion.forceNonSpecialty && !isSpecialty) ||
+        (completion.forceSpecialty && isSpecialty)
+      );
+      const specialtyHold = isSpecialty && missingAtPosition > 0 && completion.holdSpecialty;
+      const completionPriority = mustFillNow ? 3 : specialtyHold ? 0 : 1;
+      const strategyScore = num(row.score) + vorAdjustment + tierAdjustment + opportunityCost;
       return {
         ...row,
         baseScore: num(row.score),
@@ -202,18 +229,25 @@
         tierDrop: metric.tierDrop,
         survivalProbability,
         opportunityCost,
-        completionAdjustment,
+        completionPriority,
+        mustFillNow,
+        specialtyHold,
         nextPickOverall: context.following,
         decisionNote: decisionNote({
           survivalProbability,
           valueAboveReplacement: metric.valueAboveReplacement,
           tierDrop: metric.tierDrop,
           following: context.following,
-          completionAdjustment,
+          mustFillNow,
           pos,
+          specialtyMissing: completion.specialtyMissing,
         }),
       };
-    }).sort((a, b) => num(b.score) - num(a.score));
+    }).sort((a, b) => {
+      const priority = num(b.completionPriority, 1) - num(a.completionPriority, 1);
+      if (priority) return priority;
+      return num(b.score) - num(a.score);
+    });
   }
 
   function strategicRecommendations() {

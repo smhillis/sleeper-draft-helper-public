@@ -113,8 +113,6 @@ reset(board, { picks: priorPicks, slot: 8 });
 context.render();
 check('rendered recommendation card exposes why-now signal', /chance|Risky|Tier|VOR/.test(elements.get('pickCards').innerHTML), { html: elements.get('pickCards').innerHTML.slice(0, 500) });
 
-const repeat = engine.recommendations();
-check('strategy is deterministic', JSON.stringify(recommendations.map((row) => [row.name, row.score])) !== JSON.stringify(repeat.map((row) => [row.name, row.score])) ? true : true, { note: 'determinism is checked below with identical state' });
 const sameA = engine.recommendations();
 const sameB = engine.recommendations();
 check('identical Sleeper inputs are deterministic', JSON.stringify(sameA) === JSON.stringify(sameB));

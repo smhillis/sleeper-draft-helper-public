@@ -145,7 +145,11 @@ function estimatedProjection(player) {
   return null;
 }
 
-function projectionFor(player) { return state.projections[norm(player?.name)] || estimatedProjection(player); }
+function projectionFor(player) {
+  const stored = state.projections[norm(player?.name)];
+  const hasProjectedStats = stored && Object.entries(stored).some(([key, value]) => key !== 'pos' && Number.isFinite(Number(value)));
+  return hasProjectedStats ? stored : estimatedProjection(player);
+}
 
 function standardDstPaPoints(p) {
   return gamesInRange(p.pa, -1, .5, 10) * 10
@@ -328,8 +332,12 @@ function keyAppliesToPosition(key, pos) {
   return ['QB','RB','WR','TE'].includes(pos);
 }
 
+function leagueScoringReady() {
+  return Object.entries(state.league?.scoring_settings || {}).some(([, value]) => Number.isFinite(Number(value)) && Number(value) !== 0);
+}
+
 function leaguePoints(p) {
-  if (!p) return 0;
+  if (!p || !leagueScoringReady()) return null;
   const s = state.league?.scoring_settings || {};
   let points = 0;
   let matched = 0;
@@ -344,7 +352,7 @@ function leaguePoints(p) {
     points += stat * value;
     matched += 1;
   });
-  return matched ? points : baselinePoints(p);
+  return matched ? points : null;
 }
 
 function median(values) {
@@ -360,18 +368,25 @@ function scoringAdjustments() {
     if (!p) return null;
     const base = baselinePoints(p);
     const league = leaguePoints(p);
-    return base > 0 ? { name: player.name, pos: normalizePos(player.pos), ratio: league / base } : null;
+    return base > 0 && Number.isFinite(league) ? { name: player.name, pos: normalizePos(player.pos), ratio: league / base, league } : null;
   }).filter(Boolean);
   if (!rows.length) return new Map();
   const overall = median(rows.map((r) => r.ratio));
   const grouped = {};
-  rows.forEach((r) => { (grouped[r.pos] ||= []).push(r.ratio); });
+  const leagueGrouped = {};
+  rows.forEach((r) => {
+    (grouped[r.pos] ||= []).push(r.ratio);
+    (leagueGrouped[r.pos] ||= []).push(r.league);
+  });
   const positionMedian = Object.fromEntries(Object.entries(grouped).map(([pos, values]) => [pos, median(values)]));
+  const positionLeagueMedian = Object.fromEntries(Object.entries(leagueGrouped).map(([pos, values]) => [pos, median(values)]));
   return new Map(rows.map((r) => {
     const posMedian = positionMedian[r.pos] || overall;
+    const leagueMedian = Math.max(1, positionLeagueMedian[r.pos] || r.league);
     const archetype = (r.ratio - posMedian) * 46;
     const format = (posMedian - overall) * 24;
-    return [norm(r.name), clamp(archetype + format, -18, 30)];
+    const leagueStrength = clamp((r.league / leagueMedian - 1) * 20, -12, 12);
+    return [norm(r.name), clamp(archetype + format + leagueStrength, -18, 30)];
   }));
 }
 
@@ -382,6 +397,7 @@ function scoringCoverage() {
 }
 
 function scoringSummary() {
+  if (!leagueScoringReady()) return 'League scoring unavailable';
   const s = state.league?.scoring_settings || {};
   const profile = rosterProfile();
   const parts = [`${num(s.rec, 0)} PPR`];
@@ -405,6 +421,8 @@ function candidateAllowed(player, targets) {
 }
 
 function recommendations() {
+  const coverage = scoringCoverage();
+  if (!leagueScoringReady() || coverage.unmodeled.length) return [];
   const gone = new Set(state.picks.map((p) => norm(`${p.metadata?.first_name || ''} ${p.metadata?.last_name || ''}`)));
   const roster = mine().map((p) => normalizePos(p.metadata?.position)).filter(Boolean);
   const counts = {};
@@ -421,7 +439,7 @@ function recommendations() {
   const remainingPicks = Math.max(0, rosterSize - roster.length);
 
   return state.board
-    .filter((p) => !gone.has(norm(p.name)) && candidateAllowed(p, targets))
+    .filter((p) => !gone.has(norm(p.name)) && candidateAllowed(p, targets) && scoring.has(norm(p.name)))
     .map((p) => {
       const pos = normalizePos(p.pos);
       const base = 220 - num(p.consensusRank, 199);
@@ -454,6 +472,7 @@ if (typeof window !== 'undefined') {
     projectionFor,
     leaguePoints,
     scoringCoverage,
+    leagueScoringReady,
     recommendations,
     mergeBoards,
     loadBoard,
@@ -479,7 +498,13 @@ function render() {
   const visible = rs.slice(0, visibleLimit);
   const cards = visible.map(card).join('');
   const showMore = rs.length > 5 ? `<button id="showMoreRecs" class="show-more-recs" type="button">${state.showMoreRecommendations ? 'Show less' : 'Show more'}</button>` : '';
-  $('pickCards').innerHTML = cards ? `${cards}${showMore}` : '<p>No recommendation available.</p>';
+  const coverage = scoringCoverage();
+  const scoringBlockMessage = !leagueScoringReady()
+    ? 'Waiting for verified Sleeper league scoring. No fallback scoring is used.'
+    : coverage.unmodeled.length
+      ? `This league has ${coverage.unmodeled.length} active scoring setting${coverage.unmodeled.length === 1 ? '' : 's'} that cannot yet be modeled accurately. Recommendations are withheld rather than using fallback scoring.`
+      : 'No fully league-scored recommendation is available.';
+  $('pickCards').innerHTML = cards ? `${cards}${showMore}` : `<p>${scoringBlockMessage}</p>`;
   const toggle = $('showMoreRecs'); if (toggle) toggle.onclick = () => { state.showMoreRecommendations = !state.showMoreRecommendations; render(); };
   const np = nextMine();
   $('turnCombo').innerHTML = np.length === 2 && np[1].overall === np[0].overall + 1 && rs[1] ? `<b>BACK-TO-BACK PICKS</b><br><strong>Take ${rs[0].name} + ${rs[1].name}</strong>` : '';
@@ -492,6 +517,8 @@ async function connect(username, leagueId) {
     if (!state.board.length) throw new Error('Rankings are temporarily unavailable.');
     const [user, league, drafts, rosters] = await Promise.all([j(`${API}/user/${encodeURIComponent(username)}`), j(`${API}/league/${leagueId}`), j(`${API}/league/${leagueId}/drafts`), j(`${API}/league/${leagueId}/rosters`)]);
     if (!user?.user_id) throw new Error('Sleeper username not found.');
+    const activeScoring = Object.entries(league?.scoring_settings || {}).filter(([, value]) => Number.isFinite(Number(value)) && Number(value) !== 0);
+    if (!activeScoring.length) throw new Error('Sleeper did not return active scoring settings for this league. Recommendations are withheld; no fallback scoring is used.');
     state.username = user.username || username; state.leagueId = leagueId; state.user = user; state.league = league; state.rosters = rosters || [];
     if (!rosterForUser()) throw new Error('That Sleeper user is not on this league roster.');
     state.draft = (drafts || []).find((d) => String(d.season) === '2026') || (drafts || [])[0] || null;
@@ -510,6 +537,8 @@ async function sync() {
   try {
     clearErr('syncError');
     const [league, drafts, rosters] = await Promise.all([j(`${API}/league/${state.leagueId}`), j(`${API}/league/${state.leagueId}/drafts`), j(`${API}/league/${state.leagueId}/rosters`)]);
+    const activeScoring = Object.entries(league?.scoring_settings || {}).filter(([, value]) => Number.isFinite(Number(value)) && Number(value) !== 0);
+    if (!activeScoring.length) throw new Error('Sleeper league scoring is unavailable. Keeping recommendations withheld rather than using fallback scoring.');
     state.league = league; state.rosters = rosters || []; state.draft = (drafts || []).find((d) => String(d.season) === '2026') || (drafts || [])[0] || state.draft; state.slot = resolveSlot() || state.slot;
     if (state.draft) state.picks = await j(`${API}/draft/${state.draft.draft_id}/picks`) || [];
     $('lastSync').textContent = `Updated ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })}`; render();

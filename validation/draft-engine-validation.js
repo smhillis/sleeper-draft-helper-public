@@ -59,7 +59,7 @@ const idpKeys = ['idp_tkl_solo','idp_tkl_ast','idp_tkl','idp_sack','idp_int','id
 addCoverage([...offensiveKeys, ...kickerKeys, ...dstKeys, ...idpKeys, 'kr_yd','pr_yd']);
 
 for (const ppr of [0, .5, 1]) {
-  const rows = scores([wrHigh, wrLow], { scoring: { rec: ppr }, slots: ['WR','BN'] });
+  const rows = scores([wrHigh, wrLow], { scoring: { rec: ppr, rec_yd: .1, rec_td: 6 }, slots: ['WR','BN'] });
   assert(`PPR ${ppr}: high-volume receiver is not below low-volume receiver`, scoreOf(wrHigh.name, rows) >= scoreOf(wrLow.name, rows));
 }
 let rows4 = scores([qbPass, qbRush], { scoring: { pass_td: 4 }, slots: ['QB','BN'] });

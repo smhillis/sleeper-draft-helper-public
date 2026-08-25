@@ -30,14 +30,15 @@ jobs:
           text = path.read_text()
 
           replacements = {
+            "function projectionFor(player) { return state.projections[norm(player?.name)] || estimatedProjection(player); }": "function projectionFor(player) {\n  const stored = state.projections[norm(player?.name)];\n  const hasProjectedStats = stored && Object.entries(stored).some(([key, value]) => key !== 'pos' && Number.isFinite(Number(value)));\n  return hasProjectedStats ? stored : estimatedProjection(player);\n}",
             "function leaguePoints(p) {\n  if (!p) return 0;\n  const s = state.league?.scoring_settings || {};": "function leagueScoringReady() {\n  return Object.entries(state.league?.scoring_settings || {}).some(([, value]) => Number.isFinite(Number(value)) && Number(value) !== 0);\n}\n\nfunction leaguePoints(p) {\n  if (!p || !leagueScoringReady()) return null;\n  const s = state.league?.scoring_settings || {};",
             "  return matched ? points : baselinePoints(p);": "  return matched ? points : null;",
             "    return base > 0 ? { name: player.name, pos: normalizePos(player.pos), ratio: league / base } : null;": "    return base > 0 && Number.isFinite(league) ? { name: player.name, pos: normalizePos(player.pos), ratio: league / base } : null;",
-            "function recommendations() {\n  const gone = new Set": "function recommendations() {\n  if (!leagueScoringReady()) return [];\n  const gone = new Set",
+            "function recommendations() {\n  const gone = new Set": "function recommendations() {\n  const coverage = scoringCoverage();\n  if (!leagueScoringReady() || coverage.unmodeled.length) return [];\n  const gone = new Set",
             ".filter((p) => !gone.has(norm(p.name)) && candidateAllowed(p, targets))": ".filter((p) => !gone.has(norm(p.name)) && candidateAllowed(p, targets) && scoring.has(norm(p.name)))",
             "function scoringSummary() {\n  const s = state.league?.scoring_settings || {};": "function scoringSummary() {\n  if (!leagueScoringReady()) return 'League scoring unavailable';\n  const s = state.league?.scoring_settings || {};",
             "    scoringCoverage,\n    recommendations,": "    scoringCoverage,\n    leagueScoringReady,\n    recommendations,",
-            "  $('pickCards').innerHTML = cards ? `${cards}${showMore}` : '<p>No recommendation available.</p>';": "  $('pickCards').innerHTML = cards ? `${cards}${showMore}` : `<p>${leagueScoringReady() ? 'No fully league-scored recommendation is available.' : 'Waiting for verified Sleeper league scoring. No fallback scoring is used.'}</p>`;",
+            "  $('pickCards').innerHTML = cards ? `${cards}${showMore}` : '<p>No recommendation available.</p>';": "  const coverage = scoringCoverage();\n  const scoringBlockMessage = !leagueScoringReady()\n    ? 'Waiting for verified Sleeper league scoring. No fallback scoring is used.'\n    : coverage.unmodeled.length\n      ? `This league has ${coverage.unmodeled.length} active scoring setting${coverage.unmodeled.length === 1 ? '' : 's'} that cannot yet be modeled accurately. Recommendations are withheld rather than using fallback scoring.`\n      : 'No fully league-scored recommendation is available.';\n  $('pickCards').innerHTML = cards ? `${cards}${showMore}` : `<p>${scoringBlockMessage}</p>`;",
             "    if (!user?.user_id) throw new Error('Sleeper username not found.');\n    state.username = user.username || username; state.leagueId = leagueId; state.user = user; state.league = league; state.rosters = rosters || [];": "    if (!user?.user_id) throw new Error('Sleeper username not found.');\n    const activeScoring = Object.entries(league?.scoring_settings || {}).filter(([, value]) => Number.isFinite(Number(value)) && Number(value) !== 0);\n    if (!activeScoring.length) throw new Error('Sleeper did not return active scoring settings for this league. Recommendations are withheld; no fallback scoring is used.');\n    state.username = user.username || username; state.leagueId = leagueId; state.user = user; state.league = league; state.rosters = rosters || [];",
             "    const [league, drafts, rosters] = await Promise.all([j(`${API}/league/${state.leagueId}`), j(`${API}/league/${state.leagueId}/drafts`), j(`${API}/league/${state.leagueId}/rosters`)]);\n    state.league = league; state.rosters = rosters || [];": "    const [league, drafts, rosters] = await Promise.all([j(`${API}/league/${state.leagueId}`), j(`${API}/league/${state.leagueId}/drafts`), j(`${API}/league/${state.leagueId}/rosters`)]);\n    const activeScoring = Object.entries(league?.scoring_settings || {}).filter(([, value]) => Number.isFinite(Number(value)) && Number(value) !== 0);\n    if (!activeScoring.length) throw new Error('Sleeper league scoring is unavailable. Keeping recommendations withheld rather than using fallback scoring.');\n    state.league = league; state.rosters = rosters || [];"
           }
@@ -46,6 +47,15 @@ jobs:
                   raise SystemExit(f'Expected snippet not found: {old[:120]}')
               text = text.replace(old, new, 1)
           path.write_text(text)
+
+          validation = Path('validation/draft-engine-validation.js')
+          tests = validation.read_text()
+          old = "const rows = scores([wrHigh, wrLow], { scoring: { rec: ppr }, slots: ['WR','BN'] });"
+          new = "const rows = scores([wrHigh, wrLow], { scoring: { rec: ppr, rec_yd: .1, rec_td: 6 }, slots: ['WR','BN'] });"
+          if old not in tests:
+              raise SystemExit('Expected PPR fixture was not found')
+          validation.write_text(tests.replace(old, new, 1))
+
           Path('.github/workflows/strict-scoring-patch.yml').unlink()
           PY
       - name: Install
@@ -58,6 +68,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app.js .github/workflows/strict-scoring-patch.yml
+          git add app.js validation/draft-engine-validation.js .github/workflows/strict-scoring-patch.yml
           git commit -m "Enforce verified Sleeper league scoring only"
           git push origin HEAD:feature/strict-league-scoring-only

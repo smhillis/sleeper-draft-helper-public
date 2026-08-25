@@ -1,0 +1,34 @@
+(() => {
+  const platforms = {
+    yahoo: {
+      live: false,
+      url: "https://yahoo.whotodraftnext.com/",
+    },
+  };
+
+  function activateYahooLauncher() {
+    const yahoo = document.getElementById("yahooPlatform");
+    if (!yahoo || !platforms.yahoo.live) return;
+
+    yahoo.textContent = "Yahoo · Live";
+    yahoo.classList.add("live", "launchable");
+    yahoo.setAttribute("role", "link");
+    yahoo.setAttribute("tabindex", "0");
+    yahoo.setAttribute("aria-label", "Open Yahoo draft assistant");
+
+    const openYahoo = () => window.location.assign(platforms.yahoo.url);
+    yahoo.addEventListener("click", openYahoo);
+    yahoo.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openYahoo();
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", activateYahooLauncher);
+  } else {
+    activateYahooLauncher();
+  }
+})();

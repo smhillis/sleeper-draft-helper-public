@@ -67,7 +67,7 @@
 
     const survival = pct(player?.survivalProbability);
     const next = numeric(player?.nextPickOverall);
-    if (survival != null && next != null) {
+    if (survival != null && next != null && next > 0) {
       if (index === 0 && survival <= 35) return `TAKE NOW · Only ${survival}% chance available at #${Math.round(next)}`;
       if (index === 0) return `BEST PICK · ${survival}% chance available at #${Math.round(next)}`;
       if (survival <= 20) return `HIGH URGENCY · Only ${survival}% chance available at #${Math.round(next)}`;
@@ -90,7 +90,7 @@
     if (player?.mustFillNow) reasons.push(`your roster requires a ${pos} starter now`);
     if (vor != null) reasons.push(`VOR ${signedWhole(vor)} at ${pos}`);
     if (tierDrop != null && tierDrop >= 3) reasons.push(`a ${whole(tierDrop)}-point tier drop sits behind him`);
-    if (survival != null && next != null && survival <= 45) reasons.push(`only a ${survival}% chance to reach pick #${Math.round(next)}`);
+    if (survival != null && next != null && next > 0 && survival <= 45) reasons.push(`only a ${survival}% chance to reach pick #${Math.round(next)}`);
     if (waitCost != null && waitCost >= 3 && reasons.length < 3) reasons.push(`waiting costs about ${signedWhole(waitCost)} recommendation points`);
 
     return reasons.slice(0, 3).join('; ') || 'He has the highest current recommendation score among the available players.';
@@ -115,27 +115,25 @@
     const formatReason = scoringFormatEvidence(player, alternative);
     if (formatReason) reasons.push(formatReason);
 
-    if (pVor != null && aVor != null && pVor - aVor >= 3) {
-      reasons.push(`VOR ${signedWhole(pVor)} vs ${signedWhole(aVor)} for ${alternative.name}`);
+    if (pScore != null && aScore != null) {
+      reasons.push(`overall recommendation ${pScore.toFixed(1)} vs ${aScore.toFixed(1)}`);
     }
 
-    if (pTier != null && aTier != null && pTier - aTier >= 2) {
-      reasons.push(`passing on ${player.name} exposes a bigger tier drop (${whole(pTier)} vs ${whole(aTier)})`);
+    if (pTier != null && aTier != null && pTier > aTier && reasons.length < 3) {
+      reasons.push(`bigger tier drop behind ${player.name} (${whole(pTier)} vs ${whole(aTier)})`);
     }
 
-    if (pSurvival != null && aSurvival != null && aSurvival - pSurvival >= 8) {
-      const pickText = next != null ? ` at #${Math.round(next)}` : '';
-      reasons.push(`${player.name} has only a ${pSurvival}% chance back${pickText}, while ${alternative.name} is ${aSurvival}%`);
+    if (pSurvival != null && aSurvival != null && next != null && next > 0 && Math.abs(pSurvival - aSurvival) >= 5 && reasons.length < 3) {
+      reasons.push(`chance back at #${Math.round(next)} is ${pSurvival}% vs ${aSurvival}%`);
     }
 
-    if (pWait != null && aWait != null && pWait - aWait >= 3 && reasons.length < 3) {
+    if (pVor != null && aVor != null && reasons.length < 3) {
+      if (pVor >= aVor) reasons.push(`VOR ${signedWhole(pVor)} vs ${signedWhole(aVor)}`);
+      else reasons.push(`${alternative.name} has higher VOR (${signedWhole(aVor)} vs ${signedWhole(pVor)}), but ${player.name} still has the higher total recommendation`);
+    }
+
+    if (pWait != null && aWait != null && Math.abs(pWait - aWait) >= 3 && reasons.length < 3) {
       reasons.push(`wait cost ${signedWhole(pWait)} vs ${signedWhole(aWait)}`);
-    }
-
-    if (!reasons.length && pScore != null && aScore != null) {
-      reasons.push(`the league-adjusted recommendation score is ${pScore.toFixed(1)} vs ${aScore.toFixed(1)}`);
-      if (pVor != null && aVor != null) reasons.push(`VOR ${signedWhole(pVor)} vs ${signedWhole(aVor)}`);
-      if (pSurvival != null && aSurvival != null) reasons.push(`chance back is ${pSurvival}% vs ${aSurvival}%`);
     }
 
     return `Why ${player.name} over ${alternative.name}: ${reasons.slice(0, 3).join('; ')}.`;

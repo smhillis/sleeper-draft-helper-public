@@ -27,7 +27,7 @@
         .pick>.copy>.player-meta,.pick>.copy>p:first-of-type{grid-column:3/4;grid-row:2;justify-self:start;align-self:start;margin:2px 0 0!important;font-size:15px!important;font-weight:800!important;line-height:1.32!important;text-align:left!important;white-space:nowrap}
         .pick>.copy>.draft-urgency,.pick>.copy>p:nth-of-type(2){grid-column:1/-1;grid-row:3;margin:10px 0 0!important;font-size:13px!important;line-height:1.35!important}
         .pick>.copy>.draft-metrics,.pick>.copy>p:nth-of-type(3){grid-column:1/-1;grid-row:4;margin:5px 0 0!important;font-size:12.5px!important;line-height:1.4!important}
-        .pick>.copy>.draft-why,.pick>.copy>p:nth-of-type(4){grid-column:1/-1;grid-row:5;margin:6px 0 0!important;font-size:14px!important;line-height:1.45!important;white-space:pre-line}
+        .pick>.copy>.draft-why,.pick>.copy>p:nth-of-type(4){grid-column:1/-1;grid-row:5;margin:6px 0 0!important;font-size:14px!important;line-height:1.5!important;white-space:pre-line}
         .metric-help-note{margin:3px 0 11px;font-size:12.5px}
         .metric-glossary{padding:14px;margin-top:16px}
         .metric-glossary h4{font-size:15px}
@@ -82,14 +82,70 @@
     if (recs.lastElementChild !== glossary) recs.appendChild(glossary);
   }
 
-  function formatExplanations() {
-    document.querySelectorAll('.draft-why, .pick>.copy>p:nth-of-type(4)').forEach((explanation) => {
+  function signed(value) {
+    if (!Number.isFinite(value)) return '—';
+    const rounded = Math.round(value);
+    return `${rounded >= 0 ? '+' : ''}${rounded}`;
+  }
+
+  function metricValue(card, label) {
+    const metrics = card?.querySelector('.draft-metrics, .copy>p:nth-of-type(3)')?.textContent || '';
+    const pattern = new RegExp(`${label}\\s*([+-]?\\d+(?:\\.\\d+)?)`, 'i');
+    const match = metrics.match(pattern);
+    return match ? Number(match[1]) : null;
+  }
+
+  function comparisonSentence(label, playerName, alternativeName, playerValue, alternativeValue) {
+    if (!Number.isFinite(playerValue) || !Number.isFinite(alternativeValue)) return `${label}: Not available yet.`;
+    const playerText = label === 'Tier drop' ? String(Math.round(playerValue)) : signed(playerValue);
+    const alternativeText = label === 'Tier drop' ? String(Math.round(alternativeValue)) : signed(alternativeValue);
+    if (playerValue === alternativeValue) return `${label}: Equal at ${playerText}.`;
+    const leader = playerValue > alternativeValue ? playerName : alternativeName;
+    if (label === 'Tier drop') return `${label}: ${leader} has the bigger tier drop (${playerText} vs ${alternativeText}).`;
+    if (label === 'VOR') return `${label}: ${leader} has the higher VOR (${playerText} vs ${alternativeText}).`;
+    return `${label}: ${leader} has the higher wait cost (${playerText} vs ${alternativeText}).`;
+  }
+
+  function structureExplanations() {
+    const cards = Array.from(document.querySelectorAll('.recs .pick'));
+    cards.forEach((card, index) => {
+      const explanation = card.querySelector('.draft-why, .copy>p:nth-of-type(4)');
+      const alternativeCard = cards[index + 1];
+      if (!explanation || !alternativeCard) return;
+      if (/Overall recommendation:/i.test(explanation.textContent) && /Wait cost:/i.test(explanation.textContent)) return;
+
+      const playerName = card.querySelector('h2')?.textContent?.trim();
+      const alternativeName = alternativeCard.querySelector('h2')?.textContent?.trim();
+      if (!playerName || !alternativeName) return;
+
       const source = explanation.textContent.replace(/\s+/g, ' ').trim();
-      if (!source) return;
-      const formatted = source
-        .replace(/;\s+/g, ';\n')
-        .replace(/([.!?])\s+(?=[A-Z])/g, '$1\n');
-      if (explanation.textContent !== formatted) explanation.textContent = formatted;
+      const scoreMatch = source.match(/overall recommendation\s+(-?\d+(?:\.\d+)?)\s+vs\s+(-?\d+(?:\.\d+)?)/i);
+      const overall = scoreMatch
+        ? `Overall recommendation: ${Number(scoreMatch[1]).toFixed(1)} vs ${Number(scoreMatch[2]).toFixed(1)}.`
+        : `Overall recommendation: ${playerName} ranks ahead of ${alternativeName}.`;
+
+      const playerTier = metricValue(card, 'Tier drop');
+      const alternativeTier = metricValue(alternativeCard, 'Tier drop');
+      const playerVor = metricValue(card, 'VOR');
+      const alternativeVor = metricValue(alternativeCard, 'VOR');
+      const playerWait = metricValue(card, 'Wait cost');
+      const alternativeWait = metricValue(alternativeCard, 'Wait cost');
+
+      const body = source.replace(/^Why\s+.*?\s+over\s+.*?:\s*/i, '');
+      const overallIndex = body.toLowerCase().indexOf('overall recommendation');
+      const scoringEvidence = overallIndex > 0 ? body.slice(0, overallIndex).replace(/[;,.\s]+$/, '').trim() : '';
+      const bottomLine = scoringEvidence
+        ? `Bottom line: ${scoringEvidence.charAt(0).toUpperCase()}${scoringEvidence.slice(1)}; ${playerName} still has the higher total recommendation.`
+        : `Bottom line: ${playerName} has the higher total recommendation after these factors are combined.`;
+
+      explanation.textContent = [
+        `Why ${playerName} over ${alternativeName}:`,
+        overall,
+        comparisonSentence('Tier drop', playerName, alternativeName, playerTier, alternativeTier),
+        comparisonSentence('VOR', playerName, alternativeName, playerVor, alternativeVor),
+        comparisonSentence('Wait cost', playerName, alternativeName, playerWait, alternativeWait),
+        bottomLine,
+      ].join('\n');
     });
   }
 
@@ -97,7 +153,7 @@
     injectStyles();
     ensureHelpNote();
     ensureGlossary();
-    formatExplanations();
+    structureExplanations();
   }
 
   install();
@@ -105,7 +161,7 @@
   const observer = new MutationObserver(() => {
     ensureHelpNote();
     ensureGlossary();
-    formatExplanations();
+    structureExplanations();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
 })();

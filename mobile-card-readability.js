@@ -19,15 +19,15 @@
       .metric-glossary dd{margin:0;color:var(--muted,#6b7280);font-size:12.5px;line-height:1.42}
       @media(max-width:600px){
         .pick{display:grid!important;grid-template-columns:max-content max-content minmax(0,1fr) max-content!important;align-items:start!important;column-gap:10px!important;row-gap:0!important}
-        .pick>.rank{grid-column:1;grid-row:1}
-        .pick>.photo{grid-column:2;grid-row:1}
+        .pick>.rank{grid-column:1;grid-row:1/3}
+        .pick>.photo{grid-column:2;grid-row:1/3}
         .pick>.copy{display:contents!important}
-        .pick>.copy>h2{grid-column:3;grid-row:1;align-self:start;min-width:0;margin-bottom:0!important}
+        .pick>.copy>h2{grid-column:3;grid-row:1;align-self:start;min-width:0;margin:0!important;text-align:left!important}
         .pick>.badge{grid-column:4;grid-row:1;align-self:start}
-        .pick>.copy>.player-meta,.pick>.copy>p:first-of-type{grid-column:3/-1;grid-row:2;margin:2px 0 0!important;font-size:15px!important;font-weight:800!important;line-height:1.32!important}
+        .pick>.copy>.player-meta,.pick>.copy>p:first-of-type{grid-column:3/4;grid-row:2;justify-self:start;align-self:start;margin:2px 0 0!important;font-size:15px!important;font-weight:800!important;line-height:1.32!important;text-align:left!important;white-space:nowrap}
         .pick>.copy>.draft-urgency,.pick>.copy>p:nth-of-type(2){grid-column:1/-1;grid-row:3;margin:10px 0 0!important;font-size:13px!important;line-height:1.35!important}
         .pick>.copy>.draft-metrics,.pick>.copy>p:nth-of-type(3){grid-column:1/-1;grid-row:4;margin:5px 0 0!important;font-size:12.5px!important;line-height:1.4!important}
-        .pick>.copy>.draft-why,.pick>.copy>p:nth-of-type(4){grid-column:1/-1;grid-row:5;margin:6px 0 0!important;font-size:14px!important;line-height:1.45!important}
+        .pick>.copy>.draft-why,.pick>.copy>p:nth-of-type(4){grid-column:1/-1;grid-row:5;margin:6px 0 0!important;font-size:14px!important;line-height:1.45!important;white-space:pre-line}
         .metric-help-note{margin:3px 0 11px;font-size:12.5px}
         .metric-glossary{padding:14px;margin-top:16px}
         .metric-glossary h4{font-size:15px}
@@ -82,10 +82,22 @@
     if (recs.lastElementChild !== glossary) recs.appendChild(glossary);
   }
 
+  function formatExplanations() {
+    document.querySelectorAll('.draft-why, .pick>.copy>p:nth-of-type(4)').forEach((explanation) => {
+      const source = explanation.textContent.replace(/\s+/g, ' ').trim();
+      if (!source) return;
+      const formatted = source
+        .replace(/;\s+/g, ';\n')
+        .replace(/([.!?])\s+(?=[A-Z])/g, '$1\n');
+      if (explanation.textContent !== formatted) explanation.textContent = formatted;
+    });
+  }
+
   function install() {
     injectStyles();
     ensureHelpNote();
     ensureGlossary();
+    formatExplanations();
   }
 
   install();
@@ -93,6 +105,7 @@
   const observer = new MutationObserver(() => {
     ensureHelpNote();
     ensureGlossary();
+    formatExplanations();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
 })();

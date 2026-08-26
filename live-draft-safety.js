@@ -43,7 +43,7 @@
   engine.recommendations = safeRecommendations;
 
   async function getJson(url) {
-    const response = await fetch(url, { cache: 'no-store' });
+    const response = await fetch(`${url}${url.includes('?') ? '&' : '?'}_=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error(`Sleeper returned ${response.status}`);
     return response.json();
   }
@@ -51,9 +51,10 @@
   function chooseDraft(drafts) {
     const list = Array.isArray(drafts) ? drafts : [];
     const currentId = String(state.draft?.draft_id || '');
-    return list.find((draft) => draft?.status === 'drafting')
-      || list.find((draft) => String(draft?.season) === '2026' && draft?.status === 'pre_draft')
+    return list.find((draft) => String(draft?.season) === '2026' && draft?.status === 'drafting')
+      || list.find((draft) => draft?.status === 'drafting')
       || list.find((draft) => String(draft?.draft_id || '') === currentId)
+      || list.find((draft) => String(draft?.season) === '2026' && draft?.status === 'pre_draft')
       || list.find((draft) => String(draft?.season) === '2026')
       || list[0]
       || state.draft
@@ -84,12 +85,22 @@
       const draft = chooseDraft(drafts);
       if (!draft?.draft_id) throw new Error('No active Sleeper draft was found.');
       const picks = await getJson(`${API}/draft/${draft.draft_id}/picks`);
+      const nextPicks = Array.isArray(picks) ? picks : [];
+      const sameDraft = String(state.draft?.draft_id || '') === String(draft.draft_id);
+
+      // During a live draft the completed-pick feed should not move backwards.
+      // If Sleeper/CDN briefly returns an older snapshot, keep the newer state
+      // rather than reintroducing already-drafted players into recommendations.
+      if (sameDraft && Array.isArray(state.picks) && nextPicks.length < state.picks.length) {
+        throw new Error('Sleeper returned an older draft snapshot.');
+      }
 
       state.league = league;
       state.rosters = rosters || [];
       state.draft = draft;
-      state.picks = Array.isArray(picks) ? picks : [];
+      state.picks = nextPicks;
       if (typeof global.resolveSlot === 'function') state.slot = global.resolveSlot() || state.slot;
+      state.__liveDraftSafetyLastSuccess = Date.now();
 
       const error = document.getElementById('syncError');
       if (error) error.style.display = 'none';
@@ -107,14 +118,24 @@
 
   function ensureFastPolling() {
     if (!state.leagueId) return;
-    if (state.timer && state.timer !== state.__liveDraftSafetyTimer) clearInterval(state.timer);
+
+    // app.js owns state.timer. Do not put the safety interval there: connect()
+    // clears/replaces state.timer after its initial sync, which used to kill the
+    // 1-second safety poller and leave a stale interval ID behind.
     if (!state.__liveDraftSafetyTimer) {
       state.__liveDraftSafetyTimer = setInterval(safeSync, POLL_MS);
+      safeSync();
     }
-    state.timer = state.__liveDraftSafetyTimer;
+
+    // Once the independent safety poller exists, remove any slower legacy
+    // interval created by app.js so it cannot overwrite live draft state.
+    if (state.timer && state.timer !== state.__liveDraftSafetyTimer) {
+      clearInterval(state.timer);
+      state.timer = null;
+    }
   }
 
   global.sync = safeSync;
-  setInterval(ensureFastPolling, WATCHDOG_MS);
-  safeSync();
+  state.__liveDraftSafetyWatchdog = setInterval(ensureFastPolling, WATCHDOG_MS);
+  ensureFastPolling();
 })(window);

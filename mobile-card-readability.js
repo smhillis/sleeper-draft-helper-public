@@ -3,12 +3,14 @@
 
   const STYLE_ID = 'mobile-card-readability-styles';
   const GLOSSARY_CLASS = 'metric-glossary';
+  const HELP_CLASS = 'metric-help-note';
 
   function injectStyles() {
     if (document.getElementById(STYLE_ID)) return;
     const style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = `
+      .metric-help-note{margin:4px 0 12px;color:var(--muted,#6b7280);font-size:12.5px;font-weight:650;line-height:1.35;text-align:center}
       .metric-glossary{margin:18px 0 4px;padding:14px 15px;border:1px solid var(--line,#e5e7eb);border-radius:13px;background:rgba(127,127,127,.07);color:inherit}
       .metric-glossary h4{margin:0 0 10px;font-size:14px;line-height:1.25;letter-spacing:.03em}
       .metric-glossary dl{margin:0;display:grid;gap:8px}
@@ -20,12 +22,13 @@
         .pick>.rank{grid-column:1;grid-row:1}
         .pick>.photo{grid-column:2;grid-row:1}
         .pick>.copy{display:contents!important}
-        .pick>.copy>h2{grid-column:3;grid-row:1;align-self:center;min-width:0}
+        .pick>.copy>h2{grid-column:3;grid-row:1;align-self:start;min-width:0;margin-bottom:0!important}
         .pick>.badge{grid-column:4;grid-row:1;align-self:start}
-        .pick>.copy>.player-meta,.pick>.copy>p:first-of-type{grid-column:1/-1;grid-row:2;margin:11px 0 0!important;font-size:15px!important;font-weight:800!important;line-height:1.32!important}
-        .pick>.copy>.draft-urgency,.pick>.copy>p:nth-of-type(2){grid-column:1/-1;grid-row:3;margin:7px 0 0!important;font-size:13px!important;line-height:1.35!important}
+        .pick>.copy>.player-meta,.pick>.copy>p:first-of-type{grid-column:3/-1;grid-row:2;margin:2px 0 0!important;font-size:15px!important;font-weight:800!important;line-height:1.32!important}
+        .pick>.copy>.draft-urgency,.pick>.copy>p:nth-of-type(2){grid-column:1/-1;grid-row:3;margin:10px 0 0!important;font-size:13px!important;line-height:1.35!important}
         .pick>.copy>.draft-metrics,.pick>.copy>p:nth-of-type(3){grid-column:1/-1;grid-row:4;margin:5px 0 0!important;font-size:12.5px!important;line-height:1.4!important}
         .pick>.copy>.draft-why,.pick>.copy>p:nth-of-type(4){grid-column:1/-1;grid-row:5;margin:6px 0 0!important;font-size:14px!important;line-height:1.45!important}
+        .metric-help-note{margin:3px 0 11px;font-size:12.5px}
         .metric-glossary{padding:14px;margin-top:16px}
         .metric-glossary h4{font-size:15px}
         .metric-glossary .metric-definition{grid-template-columns:82px minmax(0,1fr);gap:8px}
@@ -48,23 +51,48 @@
       </dl>`;
   }
 
+  function ensureHelpNote() {
+    const recs = document.querySelector('.recs');
+    const heading = recs?.querySelector('h3');
+    if (!recs || !heading) return;
+
+    let note = recs.querySelector(`.${HELP_CLASS}`);
+    if (!note) {
+      note = document.createElement('p');
+      note.className = HELP_CLASS;
+      note.textContent = 'ADP, VOR, tier drop & wait cost explained below';
+    }
+    if (heading.nextElementSibling !== note) heading.insertAdjacentElement('afterend', note);
+  }
+
   function ensureGlossary() {
     const recs = document.querySelector('.recs');
-    if (!recs || recs.querySelector(`.${GLOSSARY_CLASS}`)) return;
-    const glossary = document.createElement('section');
-    glossary.className = GLOSSARY_CLASS;
-    glossary.setAttribute('aria-label', 'Draft metric definitions');
-    glossary.innerHTML = glossaryHtml();
-    recs.appendChild(glossary);
+    if (!recs) return;
+
+    let glossary = recs.querySelector(`.${GLOSSARY_CLASS}`);
+    if (!glossary) {
+      glossary = document.createElement('section');
+      glossary.className = GLOSSARY_CLASS;
+      glossary.setAttribute('aria-label', 'Draft metric definitions');
+      glossary.innerHTML = glossaryHtml();
+      recs.appendChild(glossary);
+      return;
+    }
+
+    if (recs.lastElementChild !== glossary) recs.appendChild(glossary);
   }
 
   function install() {
     injectStyles();
+    ensureHelpNote();
     ensureGlossary();
   }
 
   install();
   document.addEventListener('DOMContentLoaded', install, { once: true });
-  const observer = new MutationObserver(ensureGlossary);
+  const observer = new MutationObserver(() => {
+    ensureHelpNote();
+    ensureGlossary();
+  });
   observer.observe(document.documentElement, { childList: true, subtree: true });
 })();

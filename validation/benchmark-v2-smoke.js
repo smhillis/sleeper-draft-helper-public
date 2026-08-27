@@ -69,7 +69,7 @@ fs.writeFileSync(actualsPath, JSON.stringify({
 }, null, 2));
 
 const result = spawnSync(process.execPath, [
-  path.join(root, 'benchmark', 'benchmark-v2.js'),
+  path.join(root, 'benchmark', 'run-v2.js'),
   '--smoke',
   '--samples=1',
   `--ecr=${ecrPath}`,

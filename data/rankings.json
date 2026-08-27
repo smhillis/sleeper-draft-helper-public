@@ -1,27 +1,28 @@
 {
   "schemaVersion": 1,
   "season": 2026,
-  "updatedAt": "2026-08-26T12:16:00Z",
+  "updatedAt": "2026-08-27T12:05:00Z",
   "status": "daily-refresh",
   "methodology": {
     "description": "Public draft-helper PPR redraft board. Player value and market cost are intentionally kept separate. Rankings blend broad expert consensus, current projections, recent independent expert boards and material preseason/news context; ADP is treated as price rather than player quality. League scoring, roster construction, draft slot, drafted players, positional scarcity and next-pick pressure are applied by the client recommendation engine.",
     "rankingInputs": [
-      "FantasyPros 2026 PPR expert consensus and player-specific ECR/ADP pages checked Aug. 26",
-      "ESPN 2026 Fantasy Football Marathon 10-team PPR mock published Aug. 26 plus Field Yates/Mike Clay preseason rankings",
-      "CBS Sports consensus Top 200 and SportsLine breakout/bust model updates through Aug. 25",
-      "RotoWire multi-analyst PPR board updated Aug. 26",
-      "NFL.com, ESPN, team-source and local beat reporting for late-August injury/depth-chart developments",
+      "FantasyPros 2026 PPR expert consensus, ECR/ADP pages and late-August riser/faller coverage checked Aug. 27",
+      "ESPN Field Yates Top 160 plus Aug. 26 Fantasy Football Marathon 10-team PPR mock and Aug. 27 training-camp updates",
+      "CBS Sports consensus/mocks and SportsLine sleeper/breakout model updates through Aug. 27",
+      "RotoWire PPR cheat sheet, high-stakes ADP mock and preseason Week 2 analysis checked Aug. 27",
+      "NFL.com preseason Week 2/Week 3 coverage, roster-cut news, team-source and local beat reporting for injury/depth-chart developments",
       "FantasyPros consensus projections and current aggregated PPR ADP"
     ],
-    "marketInput": "Current FantasyPros aggregated PPR ADP remains the primary market-price input, cross-checked against CBS, ESPN and RotoWire. ADP is a price signal, not a substitute for player value. Ashton Jeanty's injury has now moved his PPR market price to roughly No. 14 overall, while Omarion Hampton is around No. 18 and Kenneth Walker III around No. 19.",
+    "marketInput": "Current FantasyPros aggregated PPR ADP remains the primary market-price input, cross-checked against CBS, ESPN and RotoWire. ADP is a price signal, not a substitute for player value. The Aug. 27 market still broadly supports the prior day's top-30 price map; no sufficiently large price move was found to justify a public-board value change on ADP alone.",
     "newsInputs": [
-      "Ashton Jeanty's injury discount is reduced from the Aug. 25 board. Raiders coach Klint Kubiak said Jeanty is 'on the mend,' and follow-up reporting characterizes the injury as a low/mild ankle sprain rather than a long-term injury. Week 1 remains uncertain, so the public board still ranks him below his current market and expert median rather than treating the scare as fully resolved.",
-      "Omarion Hampton receives a material value upgrade. RotoWire's Aug. 26 PPR board ranks him 14th overall, ESPN's Aug. 26 expert mock selected him 17th, FantasyPros lists him as RB10 by ECR with a current PPR ADP around 18, and SportsLine's Aug. 25 model independently identified him as a breakout candidate.",
-      "Kenneth Walker III receives a material value upgrade despite a minor foot scare. He missed Tuesday practice, but subsequent reporting described him as fine. FantasyPros lists him RB9 by ECR, RotoWire ranks him 17th overall, and ESPN's Aug. 26 expert mock selected him 11th. His prior public-board rank of 27 had become too conservative relative to role, efficiency and current expert evidence.",
-      "Malik Nabers remains in the mid-20s rather than being aggressively upgraded. The Week 1 recovery trend is positive and ESPN's Aug. 26 mock took him 22nd, but SportsLine remains notably bearish on his season-long value, preserving a wide downside range.",
-      "No new suspension or trade involving another top-30 player was found that justified a larger value move in this refresh."
+      "Ashton Jeanty remains discounted but not buried. The latest independent coverage still describes the injury as an ankle sprain rather than a long-term or season-ending issue, and no new Aug. 27 report materially worsened the outlook. Week 1 uncertainty remains the reason his public-board value stays below market.",
+      "Kenneth Walker III remains at No. 20. RotoWire continues to project a larger Kansas City role, and no new Aug. 27 practice or team report surfaced that justified reversing the Aug. 26 upgrade. The prior foot scare remains a range-widening risk rather than a ranking collapse trigger.",
+      "Malik Nabers remains at No. 24. The recovery trend toward Week 1 remains positive, but there is still enough model disagreement to preserve a wide expert range rather than force another upgrade.",
+      "Christian McCaffrey remains at No. 9. No new Aug. 27 report materially changed the injury-risk assessment after his return to practice; the board continues to price in a modest durability discount relative to market.",
+      "No new suspension, trade, depth-chart demotion, preseason-usage shock or top-30 injury development found on Aug. 27 was strong enough to produce a meaningful player-value rank change."
     ],
-    "notes": "Expert disagreement is preserved with expertLow/expertHigh ranges; unresolved injuries and genuine model disagreement can intentionally widen those ranges. Confidence reflects agreement plus news certainty, not ceiling. The Aug. 26 refresh reverses part of the emergency Ashton Jeanty injury discount, upgrades Omarion Hampton and materially corrects Kenneth Walker III upward after broader expert/usage evidence made the prior rank too low. Market/ADP changes are updated separately from player value. This file is used only by smhillis/sleeper-draft-helper-public and must not be copied into or used to modify Scott's personal Sleeper Draft Assistant."
+    "notes": "Expert disagreement is preserved with expertLow/expertHigh ranges; unresolved injuries and genuine model disagreement can intentionally widen those ranges. Confidence reflects agreement plus news certainty, not ceiling. The Aug. 27 refresh re-ran the public board against fresh FantasyPros, ESPN, CBS/SportsLine, RotoWire and NFL/team news. The prior Aug. 26 value corrections remain supported, and no new evidence met the threshold for another meaningful rank move. Market/ADP remains separate from player value. This file is used only by smhillis/sleeper-draft-helper-public and must not be copied into or used to modify Scott's personal Sleeper Draft Assistant.",
+    "researchDate": "2026-08-27"
   },
   "players": [
     {"name":"Ja'Marr Chase","pos":"WR","team":"CIN","consensusRank":1,"adp":3,"confidence":0.98,"expertHigh":1,"expertLow":6},
@@ -43,8 +44,8 @@
     {"name":"Chris Olave","pos":"WR","team":"NO","consensusRank":17,"adp":28,"confidence":0.86,"expertHigh":11,"expertLow":27,"news":"Jordyn Tyson's hamstring issue improves Olave's already strong target-volume outlook."},
     {"name":"Rashee Rice","pos":"WR","team":"KC","consensusRank":18,"adp":26,"confidence":0.82,"expertHigh":8,"expertLow":23,"news":"NFL closed its investigation with no additional discipline. Knee recovery remains the main risk, materially reducing the prior suspension discount."},
     {"name":"Omarion Hampton","pos":"RB","team":"LAC","consensusRank":19,"adp":18,"confidence":0.87,"expertHigh":14,"expertLow":25,"news":"Upgraded after converging evidence: RotoWire PPR rank 14 on Aug. 26, ESPN expert mock pick 17, FantasyPros RB10 ECR and SportsLine breakout support. Current PPR ADP around 18 is now broadly aligned with the public-board value rather than materially ahead of it."},
-    {"name":"Kenneth Walker III","pos":"RB","team":"KC","consensusRank":20,"adp":19,"confidence":0.81,"expertHigh":11,"expertLow":30,"news":"Moved sharply up from 27. FantasyPros has Walker RB9 by ECR, RotoWire ranks him 17th overall, and ESPN's Aug. 26 expert mock took him 11th. He missed Tuesday practice with a foot issue, but follow-up reporting described him as fine, so the injury widens the range rather than erasing the role/efficiency case."},
-    {"name":"Ashton Jeanty","pos":"RB","team":"LV","consensusRank":21,"adp":14,"confidence":0.68,"expertHigh":13,"expertLow":35,"news":"Moved back up from 30 after the injury outlook improved. Kubiak says Jeanty is 'on the mend' and reports characterize the injury as a low/mild ankle sprain. FantasyPros still has him RB12 by ECR, RotoWire 19th overall, and ESPN's Aug. 26 expert mock took him 13th. Week 1 uncertainty still warrants a clear discount from market price."},
+    {"name":"Kenneth Walker III","pos":"RB","team":"KC","consensusRank":20,"adp":19,"confidence":0.81,"expertHigh":11,"expertLow":30,"news":"Moved sharply up from 27. FantasyPros has Walker RB9 by ECR, RotoWire ranks him 17th overall, and ESPN's Aug. 26 expert mock took him 11th. The earlier foot issue still widens the range, but no Aug. 27 evidence justified undoing the upgrade."},
+    {"name":"Ashton Jeanty","pos":"RB","team":"LV","consensusRank":21,"adp":14,"confidence":0.68,"expertHigh":13,"expertLow":35,"news":"Remains discounted after the ankle sprain, but fresh Aug. 27 checks found no evidence of a long-term setback. Week 1 uncertainty still warrants a clear discount from market price."},
     {"name":"Trey McBride","pos":"TE","team":"ARI","consensusRank":22,"adp":21,"confidence":0.86,"expertHigh":16,"expertLow":25},
     {"name":"De'Von Achane","pos":"RB","team":"MIA","consensusRank":23,"adp":10,"confidence":0.78,"expertHigh":11,"expertLow":25},
     {"name":"Malik Nabers","pos":"WR","team":"NYG","consensusRank":24,"adp":29,"confidence":0.80,"expertHigh":14,"expertLow":33,"news":"Shed the red non-contact jersey Aug. 24 and is trending toward Week 1. ESPN's Aug. 26 expert mock selected him 22nd, while SportsLine remains materially bearish, so the public board stays near the middle with a wide downside range."},

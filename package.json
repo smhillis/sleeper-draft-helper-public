@@ -4,6 +4,6 @@
   "scripts": {
     "validate:draft-engine": "node validation/draft-engine-validation.js && node validation/draft-strategy-validation.js && node validation/mock-draft-validation.js && node validation/exhaustive-scoring-validation.js && node validation/recommendation-contract-validation.js && node validation/live-draft-regression-validation.js && node validation/benchmark-fixture-contract-validation.js && npm run benchmark:smoke",
     "benchmark:smoke": "node validation/benchmark-v2-smoke.js",
-    "benchmark": "node benchmark/benchmark-v2.js"
+    "benchmark": "node benchmark/run-v2.js"
   }
 }

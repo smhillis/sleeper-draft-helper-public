@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://whotodraftnext.com/schemas/fantasypros-ecr-benchmark-fixture.json",
+  "title": "WhoToDraftNext FantasyPros ECR benchmark fixture",
+  "type": "object",
+  "required": ["schemaVersion", "sourceType", "season", "retrievedAt", "complete", "sets"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "sourceType": { "const": "fantasypros-ecr" },
+    "season": { "const": 2026 },
+    "retrievedAt": { "type": "string" },
+    "complete": { "type": "boolean" },
+    "researchUseOnly": { "type": "boolean" },
+    "notes": { "type": "string" },
+    "sets": {
+      "type": "object",
+      "required": ["ppr", "half", "standard", "superflex"],
+      "properties": {
+        "ppr": { "$ref": "#/$defs/rankingSet" },
+        "half": { "$ref": "#/$defs/rankingSet" },
+        "standard": { "$ref": "#/$defs/rankingSet" },
+        "superflex": { "$ref": "#/$defs/rankingSet" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "rankingSet": {
+      "type": "object",
+      "required": ["sourceUrl", "scoring", "completeThroughRank", "players"],
+      "properties": {
+        "sourceUrl": { "type": "string" },
+        "sourceDate": { "type": "string" },
+        "scoring": { "enum": ["PPR", "HALF", "STD", "SUPERFLEX"] },
+        "completeThroughRank": { "type": "integer", "minimum": 1 },
+        "experts": { "type": ["integer", "null"] },
+        "players": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "rank"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "rank": { "type": "integer", "minimum": 1 },
+              "position": { "type": ["string", "null"] },
+              "team": { "type": ["string", "null"] }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

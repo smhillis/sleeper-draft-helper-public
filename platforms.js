@@ -17,8 +17,7 @@
     yahoo.setAttribute("aria-label", "Open Yahoo draft assistant");
 
     const openYahoo = () => {
-      const opened = window.open(platforms.yahoo.url, "_blank", "noopener,noreferrer");
-      if (!opened) window.location.href = platforms.yahoo.url;
+      window.location.href = platforms.yahoo.url;
     };
     yahoo.addEventListener("click", openYahoo);
     yahoo.addEventListener("keydown", (event) => {

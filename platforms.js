@@ -2,7 +2,7 @@
   const platforms = {
     yahoo: {
       live: true,
-      url: "https://yahoo.whotodraftnext.com/",
+      url: "https://yahoo.whotodraftnext.com/?source=public&v=20260828",
     },
   };
 
@@ -16,7 +16,10 @@
     yahoo.setAttribute("tabindex", "0");
     yahoo.setAttribute("aria-label", "Open Yahoo draft assistant");
 
-    const openYahoo = () => window.location.assign(platforms.yahoo.url);
+    const openYahoo = () => {
+      const opened = window.open(platforms.yahoo.url, "_blank", "noopener,noreferrer");
+      if (!opened) window.location.href = platforms.yahoo.url;
+    };
     yahoo.addEventListener("click", openYahoo);
     yahoo.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {

@@ -1,1 +1,1 @@
-{"rewrites":[{"source":"/","destination":"/app.html"}]}
+{"redirects":[{"source":"/yahoo","destination":"https://yahoo.whotodraftnext.com/","permanent":false}],"rewrites":[{"source":"/","destination":"/app.html"}]}

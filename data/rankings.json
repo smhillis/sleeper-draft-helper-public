@@ -1,41 +1,43 @@
 {
   "schemaVersion": 1,
   "season": 2026,
-  "updatedAt": "2026-09-01T12:42:00Z",
+  "updatedAt": "2026-09-02T12:16:00Z",
   "status": "daily-refresh",
   "methodology": {
     "description": "Public draft-helper PPR redraft board. Player value and market cost are intentionally kept separate. Rankings blend broad expert consensus, current projections, recent independent expert boards and material preseason/news context; ADP is treated as price rather than player quality. League scoring, roster construction, draft slot, drafted players, positional scarcity and next-pick pressure are applied by the client recommendation engine.",
     "rankingInputs": [
-      "FantasyPros 2026 PPR consensus and current real-time ADP checked Sept. 1",
-      "ESPN 2026 draft guide/current fantasy news checked Sept. 1",
-      "RotoWire Sept. 1 PPR rankings, player updates and ADP",
-      "Rotoworld/NBC Sports late-preseason rankings and player-news context checked through Sept. 1",
-      "Yahoo Sports, CBS, Fantasy Life and independent market sources checked through Sept. 1"
+      "FantasyPros 2026 PPR consensus, injury feed and current market data checked Sept. 2",
+      "ESPN Aug. 31 running-back tiers and current fantasy news checked Sept. 2",
+      "RotoWire Sept. 2 PPR rankings, health reports and ADP",
+      "CBS Sports Sept. 2 PPR consensus and analyst boards",
+      "Rotoworld/NBC Sports late-preseason rankings and player-news context checked through Sept. 2",
+      "Yahoo Sports, Fantasy Life and other independent market sources checked through Sept. 2"
     ],
-    "marketInput": "Current PPR ADP remains a separate market-price input, cross-checked across FantasyPros, Sleeper-market samples, Yahoo/CBS and other platform references. ADP is not used as a substitute for player value; large gaps remain when injury, availability, role uncertainty or expert disagreement justifies them.",
+    "marketInput": "Current PPR ADP remains a separate market-price input, cross-checked across RotoWire, FantasyPros, Sleeper-market samples, CBS/Yahoo and other platform references. ADP is not used as a substitute for player value; large gaps remain when injury, availability, role uncertainty or expert disagreement justifies them.",
     "newsInputs": [
-      "Josh Jacobs is placed on the NFL Commissioner's Exempt List and cannot practice or play while on it. His public-helper value falls sharply despite still-elevated trailing ADP because the duration is unknown; Yahoo has moved him to No. 108 while RotoWire's Sept. 1 player rank remains around No. 54, so the disagreement band is intentionally enormous.",
-      "MarShawn Lloyd is added at No. 65 as Green Bay's projected starter while Jacobs is unavailable. Fantasy Life moved him into its top 65, while older RotoWire work had him around No. 133 before the Jacobs news. FantasyPros real-time ADP has surged to about 100 overall, nearly 48 picks in a week, so value and market price are kept separate.",
-      "The existing top-30 board remains broadly stable against Sept. 1 RotoWire, FantasyPros and ESPN work; no other player had enough new information to justify a comparable move today.",
-      "Puka Nacua remains No. 4 with a wider risk band because the NFL review remains unresolved; no new exempt-list action was announced for him as of Aug. 31.",
-      "Ashton Jeanty remains No. 23 with a wide range. The ankle is still viewed as short-term, but Week 1 remains uncertain and Mike Washington Jr. has been taking first-team work."
+      "Amon-Ra St. Brown moves from No. 7 to No. 6. RotoWire's Sept. 2 PPR board ranks him sixth and CBS' fresh PPR consensus also places him sixth, creating a clearer cross-source center than the prior file reflected.",
+      "Jonathan Taylor moves from No. 8 to No. 7. CBS' Sept. 2 PPR consensus has him seventh and several CBS analysts place him as high as third overall; RotoWire remains more conservative at No. 10, so the disagreement range stays wide.",
+      "Christian McCaffrey moves from No. 6 to No. 8. RotoWire has him seventh and CBS consensus eighth, while ESPN's Aug. 31 RB tiers remain notably cautious because of last season's 413-touch workload. His ceiling is still first-round caliber, but the cross-source center no longer supports No. 6.",
+      "Ja'Marr Chase remains No. 3. Cincinnati plans to limit him in practice after the recent knee hyperextension, but coach Zac Taylor said he feels good about Chase's progress and current reports still point toward Week 1 availability.",
+      "Ashton Jeanty remains No. 23, but confidence improves slightly. Raiders GM John Spytek said Sept. 1 that Jeanty is in a good spot and could return sooner than expected; he avoided injured reserve but had not yet returned to practice, so Week 1 remains uncertain.",
+      "Josh Jacobs remains sharply discounted while on the Commissioner's Exempt List. MarShawn Lloyd remains the preferred Green Bay backfield value while Jacobs is unavailable; no firm Jacobs return date has emerged."
     ],
     "notes": "Expert disagreement is preserved with expertHigh/expertLow ranges; unresolved injuries, discipline risk and genuine model disagreement can intentionally widen those ranges. Confidence reflects agreement plus news certainty, not ceiling. This file is used only by smhillis/sleeper-draft-helper-public and must not be copied into or used to modify Scott's personal Sleeper Draft Assistant.",
-    "researchDate": "2026-09-01"
+    "researchDate": "2026-09-02"
   },
   "players": [
     {"name":"Jahmyr Gibbs","pos":"RB","team":"DET","consensusRank":1,"adp":1,"confidence":0.98,"expertHigh":1,"expertLow":4},
     {"name":"Bijan Robinson","pos":"RB","team":"ATL","consensusRank":2,"adp":2,"confidence":0.98,"expertHigh":1,"expertLow":4},
-    {"name":"Ja'Marr Chase","pos":"WR","team":"CIN","consensusRank":3,"adp":3,"confidence":0.96,"expertHigh":1,"expertLow":6},
-    {"name":"Puka Nacua","pos":"WR","team":"LAR","consensusRank":4,"adp":5,"confidence":0.83,"expertHigh":2,"expertLow":12,"news":"Still elite by talent and projection, but the board keeps a wider downside band for the recent soft-tissue concern and unresolved discipline uncertainty."},
-    {"name":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","consensusRank":5,"adp":7,"confidence":0.95,"expertHigh":4,"expertLow":9},
-    {"name":"Christian McCaffrey","pos":"RB","team":"SF","consensusRank":6,"adp":8,"confidence":0.86,"expertHigh":3,"expertLow":20,"news":"ESPN and RotoWire remain aggressive while age and recent tightness keep the downside band wider than the rank alone implies."},
-    {"name":"Amon-Ra St. Brown","pos":"WR","team":"DET","consensusRank":7,"adp":9,"confidence":0.95,"expertHigh":5,"expertLow":11},
-    {"name":"Jonathan Taylor","pos":"RB","team":"IND","consensusRank":8,"adp":5,"confidence":0.93,"expertHigh":4,"expertLow":15},
+    {"name":"Ja'Marr Chase","pos":"WR","team":"CIN","consensusRank":3,"adp":3,"confidence":0.94,"expertHigh":1,"expertLow":6,"news":"Recent knee hyperextension is being managed with limited practice work, but Cincinnati says progress is good and Week 1 remains the expected outcome barring a setback."},
+    {"name":"Puka Nacua","pos":"WR","team":"LAR","consensusRank":4,"adp":4,"confidence":0.83,"expertHigh":2,"expertLow":12,"news":"Still elite by talent and projection, but the board keeps a wider downside band for the recent soft-tissue concern and unresolved discipline uncertainty."},
+    {"name":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","consensusRank":5,"adp":6,"confidence":0.95,"expertHigh":4,"expertLow":9},
+    {"name":"Amon-Ra St. Brown","pos":"WR","team":"DET","consensusRank":6,"adp":7,"confidence":0.96,"expertHigh":5,"expertLow":11},
+    {"name":"Jonathan Taylor","pos":"RB","team":"IND","consensusRank":7,"adp":8,"confidence":0.92,"expertHigh":3,"expertLow":15,"news":"CBS is aggressively bullish while RotoWire is more conservative, so the value rank rises only one spot and the disagreement band remains broad."},
+    {"name":"Christian McCaffrey","pos":"RB","team":"SF","consensusRank":8,"adp":6,"confidence":0.82,"expertHigh":3,"expertLow":20,"news":"Still carries elite weekly projection upside, but fresh RotoWire/CBS boards and ESPN's workload caution shift the cross-source center lower. Market price remains richer than the public-helper value rank."},
     {"name":"De'Von Achane","pos":"RB","team":"MIA","consensusRank":9,"adp":11,"confidence":0.88,"expertHigh":7,"expertLow":30,"news":"ESPN and projection-driven boards remain bullish while more conservative expert boards preserve a much lower floor. The higher value rank does not erase durability and offensive-environment disagreement."},
     {"name":"James Cook III","pos":"RB","team":"BUF","consensusRank":10,"adp":10,"confidence":0.92,"expertHigh":7,"expertLow":24},
     {"name":"CeeDee Lamb","pos":"WR","team":"DAL","consensusRank":11,"adp":11,"confidence":0.90,"expertHigh":7,"expertLow":20},
-    {"name":"Justin Jefferson","pos":"WR","team":"MIN","consensusRank":12,"adp":12,"confidence":0.88,"expertHigh":8,"expertLow":20},
+    {"name":"Justin Jefferson","pos":"WR","team":"MIN","consensusRank":12,"adp":11,"confidence":0.88,"expertHigh":8,"expertLow":20},
     {"name":"Chase Brown","pos":"RB","team":"CIN","consensusRank":13,"adp":12,"confidence":0.89,"expertHigh":10,"expertLow":23},
     {"name":"Omarion Hampton","pos":"RB","team":"LAC","consensusRank":14,"adp":18,"confidence":0.90,"expertHigh":9,"expertLow":30},
     {"name":"A.J. Brown","pos":"WR","team":"NE","consensusRank":15,"adp":20,"confidence":0.85,"expertHigh":11,"expertLow":28},
@@ -46,7 +48,7 @@
     {"name":"Trey McBride","pos":"TE","team":"ARI","consensusRank":20,"adp":21,"confidence":0.88,"expertHigh":17,"expertLow":31},
     {"name":"Rashee Rice","pos":"WR","team":"KC","consensusRank":21,"adp":26,"confidence":0.84,"expertHigh":8,"expertLow":44,"news":"Projection-driven boards remain bullish while other experts are far lower, leaving one of the widest disagreement ranges in the top 30."},
     {"name":"Drake London","pos":"WR","team":"ATL","consensusRank":22,"adp":19,"confidence":0.87,"expertHigh":9,"expertLow":22},
-    {"name":"Ashton Jeanty","pos":"RB","team":"LV","consensusRank":23,"adp":14,"confidence":0.70,"expertHigh":10,"expertLow":35,"news":"The ankle outlook remains more short-term than long-term, but Week 1 is still uncertain and backup Mike Washington Jr. has taken first-team work. Market price remains richer than this value rank."},
+    {"name":"Ashton Jeanty","pos":"RB","team":"LV","consensusRank":23,"adp":14,"confidence":0.74,"expertHigh":10,"expertLow":35,"news":"Raiders GM John Spytek said Sept. 1 that Jeanty is in a good spot and could return sooner than expected. He avoided IR, but had not yet returned to practice, so Week 1 remains uncertain and market price stays richer than value rank."},
     {"name":"Jeremiyah Love","pos":"RB","team":"ARI","consensusRank":24,"adp":23,"confidence":0.68,"expertHigh":16,"expertLow":33,"news":"Week 1 availability remains plausible, but ankle recovery and offensive-environment uncertainty keep the range wide."},
     {"name":"George Pickens","pos":"WR","team":"DAL","consensusRank":25,"adp":26,"confidence":0.84,"expertHigh":9,"expertLow":29},
     {"name":"Chris Olave","pos":"WR","team":"NO","consensusRank":26,"adp":28,"confidence":0.84,"expertHigh":16,"expertLow":28},
@@ -55,7 +57,7 @@
     {"name":"DeVonta Smith","pos":"WR","team":"PHI","consensusRank":29,"adp":34,"confidence":0.82,"expertHigh":18,"expertLow":40},
     {"name":"Tetairoa McMillan","pos":"WR","team":"CAR","consensusRank":30,"adp":38,"confidence":0.73,"expertHigh":18,"expertLow":42},
     {"name":"Garrett Wilson","pos":"WR","team":"NYJ","consensusRank":34,"adp":40,"confidence":0.68,"expertHigh":20,"expertLow":49},
-    {"name":"MarShawn Lloyd","pos":"RB","team":"GB","consensusRank":65,"adp":100,"confidence":0.58,"expertHigh":60,"expertLow":133,"news":"Added after Josh Jacobs was placed on the Commissioner's Exempt List. Lloyd is the projected starter entering Week 1 and Fantasy Life moved him into the top 65, while older rankings remain far lower. FantasyPros real-time ADP has jumped to roughly 100 overall, so the board keeps a wide uncertainty band instead of pricing the new role as settled fact."},
-    {"name":"Josh Jacobs","pos":"RB","team":"GB","consensusRank":82,"adp":39,"confidence":0.35,"expertHigh":54,"expertLow":108,"news":"Major downgrade. Jacobs is on the Commissioner's Exempt List and cannot practice or play while listed, with no firm return date. RotoWire still sits near No. 54 while Yahoo has fallen to No. 108; trailing Sleeper ADP around the high 30s is stale relative to the availability risk, so market price is intentionally not treated as player value."}
+    {"name":"MarShawn Lloyd","pos":"RB","team":"GB","consensusRank":65,"adp":100,"confidence":0.58,"expertHigh":60,"expertLow":133,"news":"Added after Josh Jacobs was placed on the Commissioner's Exempt List. Lloyd is the projected starter entering Week 1 and Fantasy Life moved him into the top 65, while older rankings remain far lower. Market ADP has been rising quickly, so the board keeps a wide uncertainty band instead of pricing the new role as settled fact."},
+    {"name":"Josh Jacobs","pos":"RB","team":"GB","consensusRank":82,"adp":39,"confidence":0.35,"expertHigh":54,"expertLow":108,"news":"Major downgrade remains in force. Jacobs is on the Commissioner's Exempt List and cannot practice or play while listed, with no firm return date. Trailing ADP remains stale relative to the availability risk, so market price is intentionally not treated as player value."}
   ]
 }

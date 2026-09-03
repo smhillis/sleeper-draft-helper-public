@@ -1,7 +1,7 @@
 (function installPublicSleeperModeNav(){
   'use strict';
   if(typeof document==='undefined') return;
-  const DEST='https://sleeper.whotodraftnext.com';
+  const DEST=location.origin;
   const oldTop=document.querySelector('body > header.top');
   if(oldTop) oldTop.style.display='none';
 
@@ -37,7 +37,10 @@
 
   const header=document.createElement('div');
   header.className='wtdn-public-header';
-  header.innerHTML=`<header class="wtdn-public-inner"><div class="wtdn-public-brand-row"><img src="brand-mark.svg" alt=""><h1 class="wtdn-public-wordmark">Who To <span>Draft</span> Next</h1><button type="button" class="wtdn-public-change">Home</button></div><div class="wtdn-public-league">Sleeper · <span data-league>Fantasy Football</span></div><nav class="wtdn-public-nav" aria-label="Sleeper fantasy tools"><a class="active" href="${DEST}/">Draft</a><a href="${DEST}/waivers.html">Waivers</a><a href="${DEST}/lineup.html">Lineup</a><a href="${DEST}/mock-draft.html">Mock</a></nav></header>`;
+  const path=location.pathname.toLowerCase();
+  const active=path.includes('lineup')?'lineup':path.includes('waiver')?'waivers':path.includes('mock')?'mock':'draft';
+  const routes={draft:'/app.html',waivers:'https://sleeper.whotodraftnext.com/waivers.html',lineup:'/lineup.html',mock:'https://sleeper.whotodraftnext.com/mock-draft.html'};
+  header.innerHTML=`<header class="wtdn-public-inner"><div class="wtdn-public-brand-row"><img src="brand-mark.svg" alt=""><h1 class="wtdn-public-wordmark">Who To <span>Draft</span> Next</h1><button type="button" class="wtdn-public-change">Home</button></div><div class="wtdn-public-league">Sleeper · <span data-league>Fantasy Football</span></div><nav class="wtdn-public-nav" aria-label="Sleeper fantasy tools"><a class="${active==='draft'?'active':''}" href="${routes.draft}">Draft</a><a class="${active==='waivers'?'active':''}" href="${routes.waivers}">Waivers</a><a class="${active==='lineup'?'active':''}" href="${routes.lineup}">Lineup</a><a class="${active==='mock'?'active':''}" href="${routes.mock}">Mock</a></nav></header>`;
   document.body.insertBefore(header,document.body.firstChild);
 
   const assistant=document.getElementById('assistant');
@@ -54,8 +57,9 @@
 
   function sync(){
     const meta=(document.getElementById('leagueMeta')?.textContent||'').trim();
-    const saved=localStorage.getItem('private-sleeper-league-name-v1')||'';
-    const leagueName=(meta?meta.split(' · ')[0].trim():saved)||'Fantasy Football';
+    const saved=localStorage.getItem('wtdn-league-name')||'';
+    const selected=document.getElementById('league')?.selectedOptions?.[0]?.textContent?.trim()||'';
+    const leagueName=(meta?meta.split(' · ')[0].trim():selected||saved)||'Fantasy Football';
     if(leagueNode && leagueNode.textContent!==leagueName) leagueNode.textContent=leagueName;
     const status=(document.getElementById('draftStatus')?.textContent||'').trim().toLowerCase();
     const pickStatus=(document.getElementById('pickStatus')?.textContent||'').trim().toLowerCase();

@@ -26,12 +26,12 @@
 
   const header=document.createElement('div');
   header.className='wtdn-public-header';
-  header.innerHTML=`<header class="wtdn-public-inner"><div class="wtdn-public-brand-row"><img src="brand-mark.svg" alt=""><h1 class="wtdn-public-wordmark">Who To <span>Draft</span> Next</h1><button type="button" class="wtdn-public-change">Change</button></div><div class="wtdn-public-league">Sleeper · <span data-league>Fantasy Football</span></div><nav class="wtdn-public-nav" aria-label="Sleeper fantasy tools"><a class="active" href="${DEST}/">Draft</a><a href="${DEST}/waivers.html">Waivers</a><a href="${DEST}/lineup.html">Lineup</a><a href="${DEST}/mock-draft.html">Mock</a></nav></header>`;
+  header.innerHTML=`<header class="wtdn-public-inner"><div class="wtdn-public-brand-row"><img src="brand-mark.svg" alt=""><h1 class="wtdn-public-wordmark">Who To <span>Draft</span> Next</h1><button type="button" class="wtdn-public-change">Home</button></div><div class="wtdn-public-league">Sleeper · <span data-league>Fantasy Football</span></div><nav class="wtdn-public-nav" aria-label="Sleeper fantasy tools"><a class="active" href="${DEST}/">Draft</a><a href="${DEST}/waivers.html">Waivers</a><a href="${DEST}/lineup.html">Lineup</a><a href="${DEST}/mock-draft.html">Mock</a></nav></header>`;
   document.body.insertBefore(header,document.body.firstChild);
 
   const leagueNode=header.querySelector('[data-league]');
   const change=header.querySelector('.wtdn-public-change');
-  change?.addEventListener('click',()=>document.getElementById('changeLeague')?.click());
+  change?.addEventListener('click',()=>{location.href='https://www.whotodraftnext.com/';});
 
   function sync(){
     const meta=(document.getElementById('leagueMeta')?.textContent||'').trim();

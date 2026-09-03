@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Sleeper Lineup Assistant | Who To Draft Next</title>
+<style>
+:root{--green:#16a34a;--green-dark:#166534;--green-soft:#f0fdf4;--ink:#111827;--muted:#64748b;--line:#e5e7eb;--soft:#f8fafc;--amber:#b45309;--amber-soft:#fffbeb}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#fff;color:var(--ink)}
+.app{max-width:760px;margin:auto;padding:20px 16px 52px}.hero{border-bottom:1px solid var(--line);padding-bottom:18px}.eyebrow{font-size:13px;color:var(--green);font-weight:900;letter-spacing:.09em}.hero h1{font-size:34px;line-height:1.08;margin:6px 0 8px}.hero p{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+.setup{margin-top:18px;border:1px solid var(--line);border-radius:16px;padding:16px}.field{margin-bottom:14px}.field label{display:block;margin-bottom:7px;color:#475569;font-size:14px;font-weight:900}.field input,.field select{width:100%;min-height:54px;border:1px solid #cbd5e1;border-radius:11px;padding:12px 13px;background:#fff;font-size:18px}.actions{display:grid;grid-template-columns:1fr 1.5fr;gap:10px}.actions button{min-height:52px;border:0;border-radius:11px;font-size:17px;font-weight:900}.secondary{background:#eef2f7;color:#334155}.primary{background:var(--green);color:#fff}.error{display:none;margin-top:12px;border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;border-radius:10px;padding:13px;font-size:16px;line-height:1.45}
+.built .hero,.built .setup{display:none}.built .app{padding-top:16px}
+.action-center{display:none;border:1px solid #bbf7d0;background:var(--green-soft);border-radius:16px;padding:16px;margin-bottom:18px}.built .action-center{display:block}.action-title{font-size:13px;color:var(--green-dark);font-weight:950;letter-spacing:.07em}.action-center h2{font-size:26px;line-height:1.1;margin:5px 0 5px}.action-center p{margin:0;color:#475569;font-size:15px}.review-btn{display:block;margin-top:13px;text-align:center;text-decoration:none;background:var(--green);color:#fff;border-radius:11px;min-height:48px;padding:13px 16px;font-size:16px;font-weight:900}.risk-link{display:inline-block;margin-top:10px;color:#92400e;font-weight:900;font-size:14px;text-decoration:none}
+.section{margin-top:24px}.section h2{font-size:28px;line-height:1.12;margin:0 0 12px}.change-list,.lineup-list,.bench-list{display:grid;gap:10px}.change-card{border:2px solid var(--green);background:var(--green-soft);border-radius:14px;padding:15px}.swap{display:grid;grid-template-columns:56px 1fr;gap:8px 10px}.swap-label{font-size:13px;font-weight:950;letter-spacing:.06em}.swap-label.start{color:var(--green-dark)}.swap-label.sit{color:#991b1b}.swap-name{font-size:20px;font-weight:900}.why{margin-top:10px;padding-top:10px;border-top:1px solid #bbf7d0;color:#475569;font-size:15px;line-height:1.5}
+.player-card{border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:10px;align-items:start}.player-card.risk{border-left:4px solid #f59e0b}.slot{font-size:16px;font-weight:950;color:#475569}.name{font-size:21px;font-weight:950;line-height:1.15}.meta{margin-top:5px;color:var(--muted);font-size:15px;line-height:1.4}.status{display:none;border-radius:999px;background:#fef3c7;color:#92400e;padding:5px 8px;font-size:11px;font-weight:950}.player-card.risk .status{display:inline-block}.bench-card{border:1px solid var(--line);border-radius:12px;padding:13px}.bench-card strong{font-size:18px}.bench-card span{display:block;color:var(--muted);font-size:14px;margin-top:4px;line-height:1.4}.hold{border:1px solid #bbf7d0;background:var(--green-soft);color:var(--green-dark);border-radius:13px;padding:14px;font-size:16px;line-height:1.45}.fine{margin-top:22px;color:#9ca3af;font-size:13px;line-height:1.45}
+@media(max-width:420px){.app{padding:16px 12px 44px}.hero h1{font-size:31px}.hero p{font-size:16px}.actions{grid-template-columns:1fr 1.5fr}.player-card{grid-template-columns:48px minmax(0,1fr) auto;padding:13px}.name{font-size:20px}.meta{font-size:14px}.section h2{font-size:26px}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="hero"><div class="eyebrow">LINEUP ASSISTANT</div><h1>Set your best lineup</h1><p>Live roster, league scoring, weekly matchup context and current injury status.</p></section>
+<section id="setup" class="setup"><div class="field"><label for="username">SLEEPER USERNAME</label><input id="username" autocomplete="off"></div><div class="field"><label for="league">LEAGUE</label><select id="league"><option value="">Enter your Sleeper name first</option></select></div><div class="actions"><button id="load" class="secondary">Load leagues</button><button id="build" class="primary">Build my lineup</button></div><div id="err" class="error"></div></section>
+<section id="actionCenter" class="action-center"><div class="action-title">LINEUP CHECK</div><h2 id="actionHeading">Your lineup is ready</h2><p id="actionMeta"></p><a id="reviewChanges" class="review-btn" href="#changes">Review changes</a><a id="riskLink" class="risk-link" href="#risks"></a></section>
+<div id="output"></div>
+<p class="fine">Read-only. The assistant recommends lineup changes but does not submit roster moves or lineup changes to Sleeper.</p>
+</main>
+<script src="/public-mode-nav.js?v=20260903-3"></script>
+<script src="/lineup-engine.js?v=20260903-1"></script>
+<script>
+const $=id=>document.getElementById(id);
+const norm=s=>String(s||'').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g,' ').replace(/[^a-z0-9]/g,'');
+const engine=window.PublicLineupEngine;
+let rankings=new Map(),weeklyPlayers=[],weeklyByKey=new Map();
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showError(msg){$('err').style.display=msg?'block':'none';$('err').textContent=msg||''}
+async function getJson(url){const r=await fetch(url,{cache:'no-store'});const d=await r.json().catch(()=>({}));if(!r.ok||d.ok===false)throw new Error(d.error||'Request failed');return d}
+function key(name,pos){return norm(name)+'|'+String(pos||'').toUpperCase().replace('DST','DEF')}
+function weekKey(name,team,pos){return norm(name)+'|'+String(team||'').toUpperCase()+'|'+String(pos||'').toUpperCase().replace('DEF','DST')}
+
+async function loadResearch(){
+  const [r,w]=await Promise.all([getJson('/data/rankings.json?v='+Date.now()),getJson('/data/weekly-lineup.json?v='+Date.now())]);
+  rankings=new Map((r.players||[]).map(p=>[key(p.name,p.pos||p.position),p]));
+  weeklyPlayers=Object.values(w.players||{});
+  weeklyByKey=new Map(weeklyPlayers.map(p=>[weekKey(p.name,p.team,p.pos),p]));
+}
+function weeklyScore(p,s){
+  if(!p)return null;const n=(k,d=0)=>Number.isFinite(Number(k))?Number(k):d;
+  const pass=p.passing||{},rush=p.rushing||{},rec=p.receiving||{},kick=p.kicking||{},def=p.defense||{};
+  if(p.pos==='QB')return n(pass.yds)*n(s.pass_yd,.04)+n(pass.td)*n(s.pass_td,4)+n(pass.int)*n(s.pass_int,-2)+n(rush.yds)*n(s.rush_yd,.1)+n(rush.td)*n(s.rush_td,6)-n(p.fumblesLost)*Math.abs(n(s.fum_lost,-2));
+  if(['RB','WR','TE'].includes(p.pos))return n(rush.yds)*n(s.rush_yd,.1)+n(rush.td)*n(s.rush_td,6)+n(rec.rec)*n(s.rec,1)+n(rec.yds)*n(s.rec_yd,.1)+n(rec.td)*n(s.rec_td,6)-n(p.fumblesLost)*Math.abs(n(s.fum_lost,-2));
+  if(p.pos==='K')return n(kick.fg)*n(s.fgm,3)+n(kick.xpt)*n(s.xpm,1);
+  if(p.pos==='DST')return n(def.sacks)*n(s.def_sack,1)+n(def.interceptions)*n(s.def_int,2)+n(def.fumblesRecovered)*n(s.def_fum_rec,2)+n(def.td)*n(s.def_td,6)+n(def.safety)*n(s.def_safe,2);
+  return null;
+}
+function weeklyRank(p,scoring){
+  if(!p)return null;const rows=weeklyPlayers.filter(x=>x.pos===p.pos).map(x=>({p:x,v:weeklyScore(x,scoring)})).filter(x=>Number.isFinite(x.v)).sort((a,b)=>b.v-a.v);
+  const i=rows.findIndex(x=>norm(x.p.name)===norm(p.name)&&x.p.team===p.team);return i>=0?i+1:null;
+}
+function gameLabel(w){
+  if(!w)return '';const when=w.gameTime?new Date(w.gameTime):null;
+  const time=when&&!Number.isNaN(when.getTime())?when.toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'}):'';
+  return ['vs '+(w.opponent||'?'),time].filter(Boolean).join(' · ');
+}
+function isRisk(p,w){
+  const st=String(p.injuryStatus||'').toUpperCase();
+  return ['QUESTIONABLE','Q','GTD','DTD','DOUBTFUL','D','OUT','IR','PUP'].includes(st)||String(w?.availability||'').toLowerCase()==='monitor';
+}
+function riskLabel(p,w){const st=String(p.injuryStatus||'').toUpperCase();if(st)return st;if(String(w?.availability||'').toLowerCase()==='monitor')return 'MONITOR';return ''}
+
+async function loadLeagues(){
+  showError('');const username=$('username').value.trim();if(!username)throw new Error('Enter a Sleeper username.');
+  const d=await getJson('/api/sleeper-lineup?username='+encodeURIComponent(username));
+  $('league').innerHTML='<option value="">Choose a league</option>'+d.leagues.map(l=>'<option value="'+esc(l.leagueId)+'">'+esc(l.name)+'</option>').join('');
+  const saved=localStorage.getItem('wtdn-league');if(saved&&d.leagues.some(l=>String(l.leagueId)===saved))$('league').value=saved;
+}
+function reason(change){
+  const a=change.start,b=change.sit,parts=[];
+  if(a.weekRank&&b?.weekRank)parts.push(a.name+' grades better this week ('+a.position+a.weekRank+' vs '+b.position+b.weekRank+').');
+  else if(a.weekRank)parts.push(a.name+' carries the stronger weekly grade at '+a.position+a.weekRank+'.');
+  else if(a.rank<999&&b?.rank<999)parts.push(a.name+' has the stronger maintained research position.');
+  if(a.week?.opponent)parts.push(a.name+' faces '+a.week.opponent+'.');
+  if(a.week?.notes)parts.push(a.week.notes);
+  if(b&&isRisk(b,b.week))parts.push(b.name+' also carries a '+riskLabel(b,b.week)+' designation.');
+  return parts.join(' ');
+}
+function render(data,players,assignments){
+  const changes=engine.buildChanges(data.roster.starters||[],assignments,players);
+  const recIds=new Set(assignments.map(a=>String(a.player?.id||'')).filter(Boolean));
+  const bench=players.filter(p=>!recIds.has(String(p.id))).sort((a,b)=>b.score-a.score);
+  const risks=assignments.filter(a=>a.player&&isRisk(a.player,a.player.week));
+  $('actionHeading').textContent=changes.length?(changes.length+' lineup change'+(changes.length===1?'':'s')+' recommended'):'No lineup changes recommended';
+  $('actionMeta').textContent=risks.length?(risks.length+' player'+(risks.length===1?'':'s')+' need'+(risks.length===1?'s':'')+' attention'):'No injury risks in the recommended starters';
+  $('reviewChanges').style.display=changes.length?'block':'none';
+  $('riskLink').textContent=risks.length?('⚠ '+risks.length+' player'+(risks.length===1?'':'s')+' need monitoring'):'';
+  $('riskLink').style.display=risks.length?'inline-block':'none';
+
+  const changeHtml=changes.length?'<section id="changes" class="section"><h2>Recommended changes</h2><div class="change-list">'+changes.map(c=>'<article class="change-card"><div class="swap"><div class="swap-label start">START</div><div class="swap-name">'+esc(c.start.name)+'</div><div class="swap-label sit">SIT</div><div class="swap-name">'+esc(c.sit?.name||'Current starter')+'</div></div><div class="why">'+esc(reason(c))+'</div></article>').join('')+'</div></section>':'<section class="section"><div class="hold"><strong>HOLD:</strong> Your current starters already match the best legal lineup produced by the current weekly and injury data.</div></section>';
+
+  const lineupHtml='<section class="section"><h2>Your recommended lineup</h2><div class="lineup-list">'+assignments.map(a=>{const p=a.player;if(!p)return'<article class="player-card"><div class="slot">'+esc(a.slot.label)+'</div><div><div class="name">Open slot</div><div class="meta">No eligible rostered player found.</div></div></article>';const w=p.week,rankText=p.weekRank?(p.position+p.weekRank+' this week'):(p.rank<999?('Research rank '+p.rank):'Unranked'),g=gameLabel(w),risk=isRisk(p,w);return'<article id="'+(risk?'risks':'')+'" class="player-card '+(risk?'risk':'')+'"><div class="slot">'+esc(a.slot.label)+'</div><div><div class="name">'+esc(p.name)+'</div><div class="meta">'+esc([rankText,g].filter(Boolean).join(' · '))+'</div></div><span class="status">'+esc(riskLabel(p,w))+'</span></article>'}).join('')+'</div></section>';
+
+  const benchHtml='<section class="section"><h2>Bench</h2><div class="bench-list">'+bench.map(p=>'<div class="bench-card"><strong>'+esc(p.name)+'</strong><span>'+esc([p.position,p.weekRank?(p.position+p.weekRank+' this week'):(p.rank<999?'Research rank '+p.rank:'Unranked'),gameLabel(p.week)].filter(Boolean).join(' · '))+'</span></div>').join('')+'</div></section>';
+  $('output').innerHTML=changeHtml+lineupHtml+benchHtml;
+  document.body.classList.add('built');
+}
+async function build(){
+  showError('');const id=$('league').value;if(!id)throw new Error('Choose a Sleeper league.');
+  localStorage.setItem('wtdn-user',$('username').value.trim());localStorage.setItem('wtdn-league',id);
+  const data=await getJson('/api/sleeper-lineup?username='+encodeURIComponent($('username').value.trim())+'&leagueId='+encodeURIComponent(id));
+  const scoring=data.league.scoringSettings||{};
+  const players=data.roster.players.map(p=>{
+    const w=weeklyByKey.get(weekKey(p.name,p.team,p.position));
+    const ranked=rankings.get(key(p.name,p.position));
+    const wr=weeklyRank(w,scoring);
+    const seasonRank=Number(ranked?.consensusRank||ranked?.rank||999);
+    const base=wr?Math.max(1,500-wr*12):(seasonRank<999?Math.max(1,360-seasonRank):20);
+    const status=String(p.injuryStatus||'').toUpperCase();
+    const penalty=['OUT','IR','PUP'].includes(status)?-10000:['DOUBTFUL','D'].includes(status)?-220:['QUESTIONABLE','Q','GTD','DTD'].includes(status)?-22:0;
+    return {...p,position:engine.normalizedPos(p.position),rank:seasonRank,week:w,weekRank:wr,score:base+penalty};
+  });
+  const slots=engine.expandSlots(data.league.rosterPositions);
+  const assignments=engine.optimizeLineup(slots,players);
+  render(data,players,assignments);
+}
+$('load').onclick=()=>loadLeagues().catch(e=>showError(e.message));
+$('build').onclick=()=>build().catch(e=>showError(e.message));
+const savedUser=localStorage.getItem('wtdn-user')||'';$('username').value=savedUser;
+Promise.all([loadResearch(),savedUser?loadLeagues():Promise.resolve()]).catch(e=>showError(e.message));
+</script>
+</body>
+</html>

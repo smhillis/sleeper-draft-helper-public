@@ -36,17 +36,19 @@
   function sync(){
     const meta=(document.getElementById('leagueMeta')?.textContent||'').trim();
     const saved=localStorage.getItem('private-sleeper-league-name-v1')||'';
-    const leagueName=meta?meta.split(' · ')[0].trim():saved;
-    if(leagueNode) leagueNode.textContent=leagueName||'Fantasy Football';
+    const leagueName=(meta?meta.split(' · ')[0].trim():saved)||'Fantasy Football';
+    if(leagueNode && leagueNode.textContent!==leagueName) leagueNode.textContent=leagueName;
     const status=(document.getElementById('draftStatus')?.textContent||'').trim().toLowerCase();
     const pickStatus=(document.getElementById('pickStatus')?.textContent||'').trim().toLowerCase();
     const complete=status.includes('complete')||pickStatus==='draft complete';
-    document.body.classList.toggle('wtdn-draft-complete',complete);
+    if(document.body.classList.contains('wtdn-draft-complete')!==complete){
+      document.body.classList.toggle('wtdn-draft-complete',complete);
+    }
     if(complete){
       const cards=document.getElementById('pickCards');
-      if(cards) cards.innerHTML='';
+      if(cards && cards.childNodes.length) cards.replaceChildren();
     }
   }
   sync();
-  new MutationObserver(sync).observe(document.body,{subtree:true,childList:true,characterData:true});
+  setInterval(sync,1000);
 })();

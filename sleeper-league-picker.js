@@ -1,7 +1,5 @@
 (function installSleeperLeaguePicker(){
   'use strict';
-  const API='https://api.sleeper.app/v1';
-  const YEAR='2026';
   const USER_KEY='wtdn-user';
   const LEAGUE_KEY='wtdn-league';
   const SHARED_USER_KEY='private-sleeper-username-v1';
@@ -24,10 +22,23 @@
     error.style.display=message?'block':'none';
   }
 
-  async function json(url){
-    const response=await fetch(url,{cache:'no-store'});
-    if(!response.ok) throw new Error(`Sleeper returned ${response.status}`);
-    return response.json();
+  async function lookupLeagues(entered){
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),12000);
+    try{
+      const response=await fetch(`/api/sleeper-leagues?username=${encodeURIComponent(entered)}&t=${Date.now()}`,{
+        cache:'no-store',
+        signal:controller.signal
+      });
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(payload?.error||`League lookup failed (${response.status}).`);
+      return payload;
+    }catch(err){
+      if(err?.name==='AbortError') throw new Error('Sleeper is taking too long to respond. Try again.');
+      throw err;
+    }finally{
+      clearTimeout(timer);
+    }
   }
 
   function resetLeague(message='Enter your Sleeper name first'){
@@ -67,11 +78,10 @@
     button.textContent='Finding leagues…';
     button.disabled=true;
     try{
-      const user=await json(`${API}/user/${encodeURIComponent(entered)}`);
-      if(!user?.user_id) throw new Error('Sleeper username not found.');
-      const leagues=await json(`${API}/user/${encodeURIComponent(user.user_id)}/leagues/nfl/${YEAR}`);
-      const current=(Array.isArray(leagues)?leagues:[]).filter(item=>item?.league_id);
-      if(!current.length) throw new Error(`No ${YEAR} Sleeper leagues were found for this username.`);
+      const payload=await lookupLeagues(entered);
+      const user=payload?.user||{};
+      const current=Array.isArray(payload?.leagues)?payload.leagues:[];
+      if(!current.length) throw new Error('No 2026 Sleeper leagues were found for this username.');
 
       const saved=localStorage.getItem(LEAGUE_KEY)||localStorage.getItem(SHARED_LEAGUE_KEY)||'';
       league.innerHTML='<option value="">Choose a league</option>'+current.map(item=>`<option value="${String(item.league_id).replace(/"/g,'&quot;')}">${String(item.name||item.league_id).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</option>`).join('');
